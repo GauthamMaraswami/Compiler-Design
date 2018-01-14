@@ -3,13 +3,35 @@
 #include<string.h>
 int c=0;
 int l=0;
+unsigned long hash(unsigned char *str)
+{
+    unsigned long hash = 5381;
+    int c;
 
+    while (c = *str++)
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
+}
 struct symbol{
+int valid;
 char name[100];
 char type[100];
 int lineno[100];
 int linecount;
-} symboltable[100];
+struct symbol *next;
+} symboltable[65535];
+
+struct constants{
+int valid;
+char name[100];
+char type[100];
+int lineno[100];
+int linecount;
+struct constants *next;
+} constantstable[65535];
+
+int countconstants=0;
 int countsymbol=0;
 %}
 preprocessordirective #.*
@@ -19,8 +41,6 @@ line \n
 openparanth [{]
 closeparanth [}]
 strings ["].*["]
-formatspec %d|%f|%c|%s
-delimitter [;]
 keyword void|for|do|while|if|else|return|auto|break|case|char|const|continue|default|double|enum|extern|float|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|volatile
 intconst [0-9]+
 floatconst [0-9]+[\.][0-9]+
@@ -30,83 +50,823 @@ operator [\+|-|=|/|\*|%]
 identifier [a-z][a-zA-Z0-9]*
 %%
 {line} {
-	printf("newline character found\n");
+	//printf("\n");
 	++l;	
 	}
 {preprocessordirective} {
-//printf("preprocessor directive found");
-strncpy(symboltable[countsymbol].name,yytext,yyleng);
-strcpy(symboltable[countsymbol].type,"preProcessorDirectory");
-symboltable[countsymbol].linecount=0;
-printf("%d\n",symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]);
-symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]=l;
-++countsymbol;
-}
-{formatspec} {//printf(//"format specifier found");
-strncpy(symboltable[countsymbol].name,yytext,yyleng);
-strcpy(symboltable[countsymbol].type,"formatspecifier");
-symboltable[countsymbol].linecount=0;
-symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]=l;
-printf("%d\n",symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]);
-++countsymbol;
-}
-{openparanth} {//printf(//"open paranthesis found");
-strncpy(symboltable[countsymbol].name,yytext,yyleng);
-strcpy(symboltable[countsymbol].type,"openParanthesis");
-symboltable[countsymbol].linecount=0;
-symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]=l;
-printf("%d\n",symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]);
-++countsymbol;}
-{closeparanth} {//printf("close paranthesis found");
-strncpy(symboltable[countsymbol].name,yytext,yyleng);
-strcpy(symboltable[countsymbol].type,"closeparanthesis");
-symboltable[countsymbol].linecount=0;
-symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]=l;
-printf("%d\n",symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]);
-++countsymbol;}
-{multi_line_comments} {//printf("multi line comments ");
-strncpy(symboltable[countsymbol].name,yytext,yyleng);
-strcpy(symboltable[countsymbol].type,"multilinecomments");
-symboltable[countsymbol].linecount=0;
-symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]=l;
-printf("%d\n",symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]);
-++countsymbol;}
-{single_line_comments} {//printf("single line comments found");
-strncpy(symboltable[countsymbol].name,yytext,yyleng);
-strcpy(symboltable[countsymbol].type,"singlelinecomments");
-symboltable[countsymbol].linecount=0;
-symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]=l;
-printf("%d\n",symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]);
-++countsymbol;}
+	////printf("preprocessor directive found");
+	char ctemp[100];
+	strncpy(ctemp,yytext,yyleng);
+	unsigned long map=hash(ctemp);
+	map=map%65535;
+	//printf("%ld %s\n",map,ctemp);
+	if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)==0)
+	{
+		symboltable[map].lineno[symboltable[map].linecount]=l;
+		symboltable[map].linecount++;
 
-{intconst} {printf("integer constant found");}
-{floatconst} {printf("float constant  ");}
-{charconst} {printf("character constant");}
-{strings} {printf("strings found");}
-{specialsymbols} {printf("special symbols");	}
-{keyword} {printf("keyword found");
-strncpy(symboltable[countsymbol].name,yytext,yyleng);
-strcpy(symboltable[countsymbol].type,"keywords");
-symboltable[countsymbol].linecount=0;
-symboltable[countsymbol].lineno[symboltable[countsymbol].linecount]=l;
-++countsymbol;}
-{operator} {printf("arithmatic operator found");}
-{identifier} { printf("identifier");}
+	}
+	else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)
+	{
+		int found=0;
+		struct symbol * pointer=&symboltable[map];
+		while(pointer->next!=NULL)
+		{
+			if(strcmp(pointer->name,ctemp)==0)
+				{
+					found=1;
+				}
+				pointer=pointer->next;
+		}
+		if(found==0)
+		{
+			struct symbol * tempsymbol;
+			strncpy(tempsymbol->name,yytext,yyleng);
+			strcpy(tempsymbol->type,"preProcessorDirectory");
+			tempsymbol->linecount=0;
+			tempsymbol->valid=1;
+			tempsymbol->next=NULL;
+			tempsymbol->lineno[tempsymbol->linecount]=l;
+			tempsymbol->linecount++;
+			pointer->next=tempsymbol;
+		}
+		if(found==1)
+		{
+			pointer->lineno[pointer->linecount]=l;
+			pointer->linecount++;
+
+		}
+
+	}
+	else{
+		strncpy(symboltable[map].name,yytext,yyleng);
+		strcpy(symboltable[map].type,"preProcessorDirectory");
+		symboltable[map].linecount=0;
+		symboltable[map].valid=1;
+		symboltable[map].next=NULL;
+		symboltable[map].lineno[symboltable[map].linecount]=l;
+		symboltable[map].linecount++;
+		++countsymbol;
+		}
+		strcpy(ctemp," ");
+}
+
+{openparanth} {////printf(//"open paranthesis found");
+	char ctemp[100];
+	strcpy(ctemp," ");
+	strncpy(ctemp,yytext,yyleng);
+	unsigned long map=hash(ctemp);
+	map=map%65535;
+	//printf("%ld %s\n",map,ctemp);
+	if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)==0)
+	{
+		symboltable[map].lineno[symboltable[map].linecount]=l;
+		symboltable[map].linecount++;
+
+	}
+	else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)
+	{
+		int found=0;
+		struct symbol * pointer=&symboltable[map];
+		while(pointer->next!=NULL)
+		{
+			if(strcmp(pointer->name,ctemp)==0)
+				{
+					found=1;
+				}
+				pointer=pointer->next;
+		}
+		if(found==0)
+		{
+			struct symbol * tempsymbol;
+			strncpy(tempsymbol->name,yytext,yyleng);
+			strcpy(tempsymbol->type,"openParanthesis");
+			tempsymbol->linecount=0;
+			tempsymbol->valid=1;
+			tempsymbol->next=NULL;
+			tempsymbol->lineno[tempsymbol->linecount]=l;
+			tempsymbol->linecount++;
+			pointer->next=tempsymbol;
+		}
+		if(found==1)
+		{
+			pointer->lineno[pointer->linecount]=l;
+			pointer->linecount++;
+
+		}
+
+	}
+	else{
+		strncpy(symboltable[map].name,yytext,yyleng);
+		strcpy(symboltable[map].type,"openParanthesis");
+		symboltable[map].linecount=0;
+		symboltable[map].valid=1;
+		symboltable[map].next=NULL;
+		symboltable[map].lineno[symboltable[map].linecount]=l;
+		symboltable[map].linecount++;
+		++countsymbol;
+		}
+memset(&ctemp[0], 0, sizeof(ctemp));
+	
+}
+{closeparanth} {////printf("close paranthesis found");
+	
+	char ctemp[100];
+strcpy(ctemp," ");
+	strncpy(ctemp,yytext,yyleng);
+	unsigned long map=hash(ctemp);
+	map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+	if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)==0)
+		{
+			symboltable[map].lineno[symboltable[map].linecount]=l;
+			symboltable[map].linecount++;
+
+		}
+		else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)
+		{
+			int found=0;
+			struct symbol * pointer=&symboltable[map];
+			while(pointer->next!=NULL)
+			{
+				if(strcmp(pointer->name,ctemp)==0)
+					{
+						found=1;
+					}
+					pointer=pointer->next;
+			}
+			if(found==0)
+			{
+				struct symbol * tempsymbol;
+				strncpy(tempsymbol->name,yytext,yyleng);
+				strcpy(tempsymbol->type,"closeparanthesis");
+				tempsymbol->linecount=0;
+				tempsymbol->valid=1;
+				tempsymbol->next=NULL;
+				tempsymbol->lineno[tempsymbol->linecount]=l;
+				tempsymbol->linecount++;
+				pointer->next=tempsymbol;
+			}
+			if(found==1)
+			{
+				pointer->lineno[pointer->linecount]=l;
+				pointer->linecount++;
+
+			}
+
+		}
+		else{
+			strncpy(symboltable[map].name,yytext,yyleng);
+			strcpy(symboltable[map].type,"closeparanthesis");
+			symboltable[map].linecount=0;
+			symboltable[map].valid=1;
+			symboltable[map].next=NULL;
+			symboltable[map].lineno[symboltable[map].linecount]=l;
+			symboltable[map].linecount++;
+			++countsymbol;
+			}
+memset(&ctemp[0], 0, sizeof(ctemp));
+	
+}
+{multi_line_comments} {////printf("multi line comments ");
+	char ctemp[100];
+strcpy(ctemp," ");
+	strncpy(ctemp,yytext,yyleng);
+	unsigned long map=hash(ctemp);
+	map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+	if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)==0)
+			{
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+
+			}
+			else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)
+			{
+				int found=0;
+				struct symbol * pointer=&symboltable[map];
+				while(pointer->next!=NULL)
+				{
+					if(strcmp(pointer->name,ctemp)==0)
+						{
+							found=1;
+						}
+						pointer=pointer->next;
+				}
+				if(found==0)
+				{
+					struct symbol * tempsymbol;
+					strncpy(tempsymbol->name,yytext,yyleng);
+					strcpy(tempsymbol->type,"multilinecomments");
+					tempsymbol->linecount=0;
+					tempsymbol->valid=1;
+					tempsymbol->next=NULL;
+					tempsymbol->lineno[tempsymbol->linecount]=l;
+					tempsymbol->linecount++;
+					pointer->next=tempsymbol;
+				}
+				if(found==1)
+				{
+					pointer->lineno[pointer->linecount]=l;
+					pointer->linecount++;
+
+				}
+
+			}
+			else{
+				strncpy(symboltable[map].name,yytext,yyleng);
+				strcpy(symboltable[map].type,"multilinecomments");
+				symboltable[map].linecount=0;
+				symboltable[map].valid=1;
+				symboltable[map].next=NULL;
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+				++countsymbol;
+				}
+memset(&ctemp[0], 0, sizeof(ctemp));
+}
+{single_line_comments} {////printf("single line comments found");
+	char ctemp[100];
+	strncpy(ctemp,yytext,yyleng);
+	unsigned long map=hash(ctemp);
+	map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+	if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)==0)
+			{
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+
+			}
+			else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)
+			{
+				int found=0;
+				struct symbol * pointer=&symboltable[map];
+				while(pointer->next!=NULL)
+				{
+					if(strcmp(pointer->name,ctemp)==0)
+						{
+							found=1;
+						}
+						pointer=pointer->next;
+				}
+				if(found==0)
+				{
+					struct symbol * tempsymbol;
+					strncpy(tempsymbol->name,yytext,yyleng);
+					strcpy(tempsymbol->type,"singlelinecomments");
+					tempsymbol->linecount=0;
+					tempsymbol->valid=1;
+					tempsymbol->next=NULL;
+					tempsymbol->lineno[tempsymbol->linecount]=l;
+					tempsymbol->linecount++;
+					pointer->next=tempsymbol;
+				}
+				if(found==1)
+				{
+					pointer->lineno[pointer->linecount]=l;
+					pointer->linecount++;
+
+				}
+
+			}
+			else{
+				strncpy(symboltable[map].name,yytext,yyleng);
+				strcpy(symboltable[map].type,"singlelinecomments");
+				symboltable[map].linecount=0;
+				symboltable[map].valid=1;
+				symboltable[map].next=NULL;
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+				++countsymbol;
+				}
+memset(&ctemp[0], 0, sizeof(ctemp));
+}
+
+{intconst} {//printf("integer constant found");
+char ctemp[100];
+strcpy(ctemp," ");
+strncpy(ctemp,yytext,yyleng);
+unsigned long map=hash(ctemp);
+map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+if(constantstable[map].valid==1&&strcmp(constantstable[map].name,ctemp)==0)
+			{
+				constantstable[map].lineno[constantstable[map].linecount]=l;
+				constantstable[map].linecount++;
+				
+
+			}
+			else if(constantstable[map].valid==1&&strcmp(constantstable[map].name,ctemp)!=0)
+			{
+				int found=0;
+				struct constants * pointer=&constantstable[map];
+				while(pointer->next!=NULL)
+				{
+					if(strcmp(pointer->name,ctemp)==0)
+						{
+							found=1;
+						}
+					pointer=pointer->next;
+				}
+				if(found==0)
+				{
+					struct constants * tempconstants;
+					strncpy(tempconstants->name,yytext,yyleng);
+					strcpy(tempconstants->type,"identifier");
+					tempconstants->linecount=0;
+					tempconstants->valid=1;
+					tempconstants->next=NULL;
+					tempconstants->lineno[tempconstants->linecount]=l;
+					tempconstants->linecount++;
+					pointer->next=tempconstants;
+				}
+				if(found==1)
+				{
+					pointer->lineno[pointer->linecount]=l;
+					pointer->linecount++;
+
+				}
+
+			}
+			else{
+				strncpy(constantstable[map].name,yytext,yyleng);
+				strcpy(constantstable[map].type,"identifier");
+				constantstable[map].linecount=0;
+				constantstable[map].valid=1;
+				constantstable[map].next=NULL;
+				constantstable[map].lineno[constantstable[map].linecount]=l;
+				constantstable[map].linecount++;
+				++countconstants;
+				}
+memset(&ctemp[0], 0, sizeof(ctemp));
+
+
+
+
+}
+{floatconst} {//printf("float constant  ");
+char ctemp[100];
+strcpy(ctemp," ");
+strncpy(ctemp,yytext,yyleng);
+unsigned long map=hash(ctemp);
+map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+if(constantstable[map].valid==1&&strcmp(constantstable[map].name,ctemp)==0)
+			{
+				constantstable[map].lineno[constantstable[map].linecount]=l;
+				constantstable[map].linecount++;
+				
+
+			}
+			else if(constantstable[map].valid==1&&strcmp(constantstable[map].name,ctemp)!=0)
+			{
+				int found=0;
+				struct constants * pointer=&constantstable[map];
+				while(pointer->next!=NULL)
+				{
+					if(strcmp(pointer->name,ctemp)==0)
+						{
+							found=1;
+						}
+					pointer=pointer->next;
+				}
+				if(found==0)
+				{
+					struct constants * tempconstants;
+					strncpy(tempconstants->name,yytext,yyleng);
+					strcpy(tempconstants->type,"identifier");
+					tempconstants->linecount=0;
+					tempconstants->valid=1;
+					tempconstants->next=NULL;
+					tempconstants->lineno[tempconstants->linecount]=l;
+					tempconstants->linecount++;
+					pointer->next=tempconstants;
+				}
+				if(found==1)
+				{
+					pointer->lineno[pointer->linecount]=l;
+					pointer->linecount++;
+
+				}
+
+			}
+			else{
+				strncpy(constantstable[map].name,yytext,yyleng);
+				strcpy(constantstable[map].type,"identifier");
+				constantstable[map].linecount=0;
+				constantstable[map].valid=1;
+				constantstable[map].next=NULL;
+				constantstable[map].lineno[constantstable[map].linecount]=l;
+				constantstable[map].linecount++;
+				++countconstants;
+				}
+memset(&ctemp[0], 0, sizeof(ctemp));}
+{charconst} {//printf("character constant");
+char ctemp[100];
+strcpy(ctemp," ");
+strncpy(ctemp,yytext,yyleng);
+unsigned long map=hash(ctemp);
+map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+if(constantstable[map].valid==1&&strcmp(constantstable[map].name,ctemp)==0)
+			{
+				constantstable[map].lineno[constantstable[map].linecount]=l;
+				constantstable[map].linecount++;
+				
+
+			}
+			else if(constantstable[map].valid==1&&strcmp(constantstable[map].name,ctemp)!=0)
+			{
+				int found=0;
+				struct constants * pointer=&constantstable[map];
+				while(pointer->next!=NULL)
+				{
+					if(strcmp(pointer->name,ctemp)==0)
+						{
+							found=1;
+						}
+					pointer=pointer->next;
+				}
+				if(found==0)
+				{
+					struct constants * tempconstants;
+					strncpy(tempconstants->name,yytext,yyleng);
+					strcpy(tempconstants->type,"identifier");
+					tempconstants->linecount=0;
+					tempconstants->valid=1;
+					tempconstants->next=NULL;
+					tempconstants->lineno[tempconstants->linecount]=l;
+					tempconstants->linecount++;
+					pointer->next=tempconstants;
+				}
+				if(found==1)
+				{
+					pointer->lineno[pointer->linecount]=l;
+					pointer->linecount++;
+
+				}
+
+			}
+			else{
+				strncpy(constantstable[map].name,yytext,yyleng);
+				strcpy(constantstable[map].type,"identifier");
+				constantstable[map].linecount=0;
+				constantstable[map].valid=1;
+				constantstable[map].next=NULL;
+				constantstable[map].lineno[constantstable[map].linecount]=l;
+				constantstable[map].linecount++;
+				++countconstants;
+				}
+memset(&ctemp[0], 0, sizeof(ctemp));}
+{strings} {//printf("strings found");
+char ctemp[100];
+strcpy(ctemp," ");
+strncpy(ctemp,yytext,yyleng);
+unsigned long map=hash(ctemp);
+map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+if(constantstable[map].valid==1&&strcmp(constantstable[map].name,ctemp)==0)
+			{
+				constantstable[map].lineno[constantstable[map].linecount]=l;
+				constantstable[map].linecount++;
+				
+
+			}
+			else if(constantstable[map].valid==1&&strcmp(constantstable[map].name,ctemp)!=0)
+			{
+				int found=0;
+				struct constants * pointer=&constantstable[map];
+				while(pointer->next!=NULL)
+				{
+					if(strcmp(pointer->name,ctemp)==0)
+						{
+							found=1;
+						}
+					pointer=pointer->next;
+				}
+				if(found==0)
+				{
+					struct constants * tempconstants;
+					strncpy(tempconstants->name,yytext,yyleng);
+					strcpy(tempconstants->type,"identifier");
+					tempconstants->linecount=0;
+					tempconstants->valid=1;
+					tempconstants->next=NULL;
+					tempconstants->lineno[tempconstants->linecount]=l;
+					tempconstants->linecount++;
+					pointer->next=tempconstants;
+				}
+				if(found==1)
+				{
+					pointer->lineno[pointer->linecount]=l;
+					pointer->linecount++;
+
+				}
+
+			}
+			else{
+				strncpy(constantstable[map].name,yytext,yyleng);
+				strcpy(constantstable[map].type,"identifier");
+				constantstable[map].linecount=0;
+				constantstable[map].valid=1;
+				constantstable[map].next=NULL;
+				constantstable[map].lineno[constantstable[map].linecount]=l;
+				constantstable[map].linecount++;
+				++countconstants;
+				}
+memset(&ctemp[0], 0, sizeof(ctemp));}
+{specialsymbols} {//printf("special symbols");	
+char ctemp[100];
+strcpy(ctemp," ");
+strncpy(ctemp,yytext,yyleng);
+unsigned long map=hash(ctemp);
+map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)==0)
+			{
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+				//printf("reaching");
+
+			}
+			else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)
+			{
+				int found=0;
+				struct symbol * pointer=&symboltable[map];
+				while(pointer->next!=NULL)
+				{
+					if(strcmp(pointer->name,ctemp)==0)
+						{
+							found=1;
+						}
+					pointer=pointer->next;
+				}
+				if(found==0)
+				{
+					struct symbol * tempsymbol;
+					strncpy(tempsymbol->name,yytext,yyleng);
+					strcpy(tempsymbol->type,"special symbols");
+					tempsymbol->linecount=0;
+					tempsymbol->valid=1;
+					tempsymbol->next=NULL;
+					tempsymbol->lineno[tempsymbol->linecount]=l;
+					tempsymbol->linecount++;
+					pointer->next=tempsymbol;
+				}
+				if(found==1)
+				{
+					pointer->lineno[pointer->linecount]=l;
+					pointer->linecount++;
+
+				}
+
+			}
+			else{
+				strncpy(symboltable[map].name,yytext,yyleng);
+				strcpy(symboltable[map].type,"special symbols");
+				symboltable[map].linecount=0;
+				symboltable[map].valid=1;
+				symboltable[map].next=NULL;
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+				++countsymbol;
+//printf("reaching1");
+				}
+memset(&ctemp[0], 0, sizeof(ctemp));}
+{keyword} {
+char ctemp[100];
+strcpy(ctemp," ");
+strncpy(ctemp,yytext,yyleng);
+unsigned long map=hash(ctemp);
+map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)==0)
+			{
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+				//printf("reaching");
+
+			}
+			else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)
+			{
+				int found=0;
+				struct symbol * pointer=&symboltable[map];
+				while(pointer->next!=NULL)
+				{
+					if(strcmp(pointer->name,ctemp)==0)
+						{
+							found=1;
+						}
+					pointer=pointer->next;
+				}
+				if(found==0)
+				{
+					struct symbol * tempsymbol;
+					strncpy(tempsymbol->name,yytext,yyleng);
+					strcpy(tempsymbol->type,"keywords");
+					tempsymbol->linecount=0;
+					tempsymbol->valid=1;
+					tempsymbol->next=NULL;
+					tempsymbol->lineno[tempsymbol->linecount]=l;
+					tempsymbol->linecount++;
+					pointer->next=tempsymbol;
+				}
+				if(found==1)
+				{
+					pointer->lineno[pointer->linecount]=l;
+					pointer->linecount++;
+
+				}
+
+			}
+			else{
+				strncpy(symboltable[map].name,yytext,yyleng);
+				strcpy(symboltable[map].type,"keywords");
+				symboltable[map].linecount=0;
+				symboltable[map].valid=1;
+				symboltable[map].next=NULL;
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+				++countsymbol;
+//printf("reaching1");
+				}
+memset(&ctemp[0], 0, sizeof(ctemp));
+
+}
+{operator} {;
+char ctemp[100];
+strcpy(ctemp," ");
+strncpy(ctemp,yytext,yyleng);
+unsigned long map=hash(ctemp);
+map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)==0)
+			{
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+				
+
+			}
+			else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)
+			{
+				int found=0;
+				struct symbol * pointer=&symboltable[map];
+				while(pointer->next!=NULL)
+				{
+					if(strcmp(pointer->name,ctemp)==0)
+						{
+							found=1;
+						}
+					pointer=pointer->next;
+				}
+				if(found==0)
+				{
+					struct symbol * tempsymbol;
+					strncpy(tempsymbol->name,yytext,yyleng);
+					strcpy(tempsymbol->type,"operator");
+					tempsymbol->linecount=0;
+					tempsymbol->valid=1;
+					tempsymbol->next=NULL;
+					tempsymbol->lineno[tempsymbol->linecount]=l;
+					tempsymbol->linecount++;
+					pointer->next=tempsymbol;
+				}
+				if(found==1)
+				{
+					pointer->lineno[pointer->linecount]=l;
+					pointer->linecount++;
+
+				}
+
+			}
+			else{
+				strncpy(symboltable[map].name,yytext,yyleng);
+				strcpy(symboltable[map].type,"operator");
+				symboltable[map].linecount=0;
+				symboltable[map].valid=1;
+				symboltable[map].next=NULL;
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+				++countsymbol;
+				}
+memset(&ctemp[0], 0, sizeof(ctemp));
+
+}
+{identifier} { 
+char ctemp[100];
+strcpy(ctemp," ");
+strncpy(ctemp,yytext,yyleng);
+unsigned long map=hash(ctemp);
+map=map%65535;
+//printf("%ld %s\n",map,ctemp);
+if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)==0)
+			{
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+				
+
+			}
+			else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)
+			{
+				int found=0;
+				struct symbol * pointer=&symboltable[map];
+				while(pointer->next!=NULL)
+				{
+					if(strcmp(pointer->name,ctemp)==0)
+						{
+							found=1;
+						}
+					pointer=pointer->next;
+				}
+				if(found==0)
+				{
+					struct symbol * tempsymbol;
+					strncpy(tempsymbol->name,yytext,yyleng);
+					strcpy(tempsymbol->type,"identifier");
+					tempsymbol->linecount=0;
+					tempsymbol->valid=1;
+					tempsymbol->next=NULL;
+					tempsymbol->lineno[tempsymbol->linecount]=l;
+					tempsymbol->linecount++;
+					pointer->next=tempsymbol;
+				}
+				if(found==1)
+				{
+					pointer->lineno[pointer->linecount]=l;
+					pointer->linecount++;
+
+				}
+
+			}
+			else{
+				strncpy(symboltable[map].name,yytext,yyleng);
+				strcpy(symboltable[map].type,"identifier");
+				symboltable[map].linecount=0;
+				symboltable[map].valid=1;
+				symboltable[map].next=NULL;
+				symboltable[map].lineno[symboltable[map].linecount]=l;
+				symboltable[map].linecount++;
+				++countsymbol;
+				}
+memset(&ctemp[0], 0, sizeof(ctemp));
+}
 %%
 int main()
 {
 yyin=fopen("tester.c","r");
 yylex();
-for(int i=0;i<countsymbol;++i)
+printf("\nsymbols table\n");
+for(int i=0;i<65535;++i)
 {
-		printf("%s %s %d ",symboltable[i].name,symboltable[i].type,symboltable[i].linecount);
-		for(int j=0;j<=symboltable[i].linecount;++j)
+		if(symboltable[i].valid==1)
 		{
-			printf("%d",symboltable[i].lineno[j]);
+			struct symbol * pointer=&symboltable[i];
+			while(pointer->next!=NULL)
+				{
+					printf("%s %s %d ",pointer->name,pointer->type,pointer->linecount);
+					for(int j=0;j<pointer->linecount;++j)
+					{
+						printf("%d ",pointer->lineno[j]);
+					}
+						pointer=pointer->next;
+					
+				}
+		printf("%s %s %d ",pointer->name,pointer->type,pointer->linecount);
+					for(int j=0;j<pointer->linecount;++j)
+					{
+						printf("%d ",pointer->lineno[j]);
+					}
+						pointer=pointer->next;
+		
+		printf("\n");
 		}
-printf("\n");
 }
-printf("count of characters is %d\n",c);
+printf("constant table\n");
+for(int i=0;i<65535;++i)
+{
+		if(constantstable[i].valid==1)
+		{
+			struct constants * pointer=&constantstable[i];
+			while(pointer->next!=NULL)
+				{
+					printf("%s %s %d ",pointer->name,pointer->type,pointer->linecount);
+					for(int j=0;j<pointer->linecount;++j)
+					{
+						printf("%d ",pointer->lineno[j]);
+					}
+						pointer=pointer->next;
+					
+				}
+		printf("%s %s %d ",pointer->name,pointer->type,pointer->linecount);
+					for(int j=0;j<pointer->linecount;++j)
+					{
+						printf("%d ",pointer->lineno[j]);
+					}
+						pointer=pointer->next;
+		
+		printf("\n");
+		}
+}
 printf("count of lines is %d\n",l);
 return 0;
 }
