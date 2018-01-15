@@ -289,7 +289,10 @@ error .*
 	push_to_symbol_table(ctemp,map,"identifier");
 	memset(&ctemp[0], 0, sizeof(ctemp));
 }
+{error} {
 
+printf("error\n");
+}
 %%
 int main()
 {
