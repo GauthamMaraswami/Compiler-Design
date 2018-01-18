@@ -5,6 +5,11 @@ int main()
 /*boom
 b
 a*/
+*/
+/*
+anda
+*/
+
 
 	funct ();
 	int a1bc=0;
