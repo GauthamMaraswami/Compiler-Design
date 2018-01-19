@@ -168,7 +168,8 @@ charconst [a-z|A-Z]
 functions [a-z][a-zA-Z0-9]*\(.*\)
 specialsymbols \(|\)|\]|\[|,
 delimitter ;
-operator [\+|-|=|/|\*|%|>|<|&|\|]
+operator [\+|\-|=|/|\*|%|>|<|&|\|]
+notIdentifier [^a-zA-Z\t\n\ "\(|\)|\]|\[|,|"|\+|\-|=|/|\*|%|>|<|&|\||_|;][a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]*
 identifier [a-z][a-zA-Z0-9]*
 error .
 %%
@@ -359,6 +360,15 @@ if(commentflag==0){
 		printf("%s",yytext);
 	}
 }
+{notIdentifier} {
+if(commentflag==0){
+printf("Error:Invalid Identifier%s\n ",yytext);
+}
+else{
+printf("%s",yytext);
+}
+
+}
 {identifier} { 
 if(commentflag==0){
 	char ctemp[100];
@@ -380,9 +390,11 @@ if(commentflag==0){
 	}
 }
 %%
-int main()
+int main(int argc, char** argv)
 {
-	yyin=fopen("tester.c","r");
+	char cfile[10];
+	strcpy(cfile,argv[1]);
+	yyin=fopen(cfile,"r");
 	yylex();
 	if(stacktop!=-1)
 	{
