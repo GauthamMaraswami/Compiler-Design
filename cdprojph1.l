@@ -164,13 +164,13 @@ strings ["].*["]
 keyword void|for|do|while|if|else|return|auto|break|case|char|const|continue|default|double|enum|extern|float|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|volatile
 intconst [0-9]+
 floatconst [0-9]+[\.][0-9]+
-charconst [a-z|A-Z]
+charconst ['][a-z|A-Z][']
 functions [a-z][a-zA-Z0-9]*\(.*\)
 specialsymbols \(|\)|\]|\[|,
 delimitter ;
 operator [\+|\-|=|/|\*|%|>|<|&|\|]
 notIdentifier [^a-zA-Z\t\n\ "\(|\)|\]|\[|,|"|\+|\-|=|/|\*|%|>|<|&|\||_|;][a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]*
-identifier [a-z][a-zA-Z0-9]*
+identifier [a-zA-Z][a-zA-Z0-9]*
 error .
 %%
 {line} {

@@ -369,8 +369,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 20
-#define YY_END_OF_BUFFER 21
+#define YY_NUM_RULES 5
+#define YY_END_OF_BUFFER 6
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -378,43 +378,28 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[155] =
+static yyconst flex_int16_t yy_accept[17] =
     {   0,
-        0,    0,   21,   19,    2,    1,   19,    3,   16,   19,
-       13,   16,   16,    9,   14,   18,   19,   18,   18,   18,
-       18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
-       18,   18,    4,    5,    0,   17,    0,   12,    3,    3,
-        3,   17,    0,    7,    6,    8,    0,    9,   18,   18,
-       18,   18,   18,   18,   18,   15,   18,   18,   18,   18,
-       18,   18,   15,   18,   18,   18,   18,   18,   18,   18,
-       18,   18,   18,   18,   17,   17,    3,    3,   11,    8,
-       10,   18,   18,   18,   18,   18,   18,   18,   18,   18,
-       18,   18,   15,   18,   18,   18,   18,   18,   18,   18,
-
-       18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
-       18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
-       18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
-       18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
-       18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
-       18,   18,   18,    0
+        0,    0,    6,    5,    4,    2,    1,    1,    2,    1,
+        1,    1,    1,    1,    1,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    2,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    4,    1,    5,    6,    1,    7,    7,    8,    9,
-       10,   11,    7,   12,    7,   13,   14,   15,   15,   15,
-       15,   15,   15,   15,   15,   15,   15,    1,   16,    7,
-        7,    7,    1,    1,   17,   17,   17,   17,   17,   17,
-       17,   17,   17,   17,   17,   17,   17,   17,   17,   17,
-       17,   17,   17,   17,   17,   17,   17,   17,   17,   17,
-       18,    1,   19,    1,   20,    1,   21,   22,   23,   24,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    3,    3,    3,
+        3,    3,    3,    3,    3,    3,    3,    1,    1,    1,
+        1,    1,    1,    1,    4,    4,    4,    4,    4,    4,
+        4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
+        4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
+        1,    1,    1,    1,    1,    1,    4,    4,    4,    4,
 
-       25,   26,   27,   28,   29,   17,   30,   31,   32,   33,
-       34,   35,   17,   36,   37,   38,   39,   40,   41,   42,
-       43,   44,   45,   46,   47,    1,    1,    1,    1,    1,
+        5,    4,    4,    4,    4,    4,    4,    4,    4,    6,
+        4,    4,    4,    7,    4,    8,    9,    4,    4,    4,
+        4,    4,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -431,143 +416,35 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst flex_int32_t yy_meta[48] =
+static yyconst flex_int32_t yy_meta[10] =
     {   0,
-        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    3,    1,    3,    1,    1,    1,
-        3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
-        3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
-        3,    3,    3,    3,    1,    4,    1
+        1,    1,    2,    2,    2,    2,    2,    2,    2
     } ;
 
-static yyconst flex_int16_t yy_base[162] =
+static yyconst flex_int16_t yy_base[18] =
     {   0,
-        0,    0,  304,  288,  305,  305,  297,   47,  305,   80,
-      305,  287,   85,   85,  305,    0,  305,  261,  263,   76,
-       77,   70,   74,  264,   80,  263,  271,   86,  252,  261,
-      259,  264,  276,  275,  274,  273,  282,  281,    0,    0,
-      127,  101,  277,  305,  305,    0,  269,  104,    0,  245,
-      257,  244,  259,  246,  252,  238,  239,  236,  236,  239,
-      236,  233,    0,  232,  236,   80,  234,  148,  155,  238,
-      231,   93,   92,  236,  249,  248,    0,    0,  305,    0,
-      247,  227,  239,  234,  222,  140,  236,  234,  230,  222,
-      228,  231,    0,  217,  223,  220,  209,  211,  213,  220,
-
-      206,  204,  204,  216,  206,  210,  214,  216,  205,  205,
-      196,  204,  193,  200,  194,  191,  191,  191,  188,  200,
-      190,  194,  199,  198,  196,  186,  191,  179,  191,  182,
-      183,  188,  179,  173,  177,  185,  182,  184,  166,  172,
-      169,  157,  160,  149,  149,  161,  159,  159,  152,  157,
-      145,  156,  154,  305,  122,  192,  194,  117,   47,  198,
-      202
+        0,    0,   18,   19,   19,   14,    0,   11,   12,    0,
+        6,    4,    5,    5,    0,   19,    8
     } ;
 
-static yyconst flex_int16_t yy_def[162] =
+static yyconst flex_int16_t yy_def[18] =
     {   0,
-      154,    1,  154,  155,  154,  154,  156,  154,  154,  157,
-      154,  154,  154,  155,  154,  158,  154,  158,  158,  158,
-      158,  158,  158,  158,  158,  158,  158,  158,  158,  158,
-      158,  158,  155,  155,  155,  159,  156,  156,  160,    8,
-      154,  159,  154,  154,  154,  161,  154,  155,  158,  158,
-      158,  158,  158,  158,  158,  158,  158,  158,  158,  158,
-      158,  158,  158,  158,  158,  158,  158,  158,  158,  158,
-      158,  158,  158,  158,  159,  159,   41,   41,  154,  161,
-      154,  158,  158,  158,  158,  158,  158,  158,  158,  158,
-      158,  158,  158,  158,  158,  158,  158,  158,  158,  158,
-
-      158,  158,  158,  158,  158,  158,  158,  158,  158,  158,
-      158,  158,  158,  158,  158,  158,  158,  158,  158,  158,
-      158,  158,  158,  158,  158,  158,  158,  158,  158,  158,
-      158,  158,  158,  158,  158,  158,  158,  158,  158,  158,
-      158,  158,  158,  158,  158,  158,  158,  158,  158,  158,
-      158,  158,  158,    0,  154,  154,  154,  154,  154,  154,
-      154
+       16,    1,   16,   16,   16,   16,   17,   17,   16,   17,
+       17,   17,   17,   17,   17,    0,   16
     } ;
 
-static yyconst flex_int16_t yy_nxt[353] =
+static yyconst flex_int16_t yy_nxt[29] =
     {   0,
-        4,    5,    6,    5,    7,    8,    9,   10,   11,   11,
-       12,   11,    4,   13,   14,   15,   16,   11,   11,   17,
-       18,   19,   20,   21,   22,   23,   24,   16,   25,   16,
-       26,   16,   16,   16,   16,   27,   28,   29,   30,   31,
-       32,   16,   16,   16,   33,    9,   34,   39,   39,   76,
-       39,   39,   39,   39,   39,   39,   39,   39,   39,   39,
-       39,   40,   39,   41,   39,   39,   39,   41,   41,   41,
-       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
-       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
-       41,   39,   39,   39,   35,   45,   52,   47,   46,   48,
-
-       57,   55,   58,   53,   60,   63,   96,   61,   79,   54,
-       56,   59,   64,   67,   68,   75,   47,   97,   48,   49,
-      107,  105,  108,   69,   36,   43,   70,   39,   39,  106,
-       39,   39,   39,   39,   39,   39,   39,   39,   39,   39,
-       39,   77,   39,   78,   39,   39,   39,   78,   78,   78,
-       78,   78,   78,   78,   78,   78,   78,   78,   78,   78,
-       78,   78,   78,   78,   78,   78,   78,   78,   78,   78,
-       78,   39,   39,   39,   99,  101,  111,  112,   93,   93,
-       93,   93,  153,  152,   93,  151,   93,  150,  149,  148,
-      102,  100,   37,  147,   37,   37,   42,   42,   39,   93,
-
-       39,   39,   80,   93,   80,   80,   93,   93,   93,   63,
-      146,   93,   93,  145,  144,   93,  143,  142,   93,  141,
-      140,  139,  138,  137,  136,   93,  135,  134,   93,  133,
-      132,  131,  130,   93,   93,  129,  128,   93,  127,  126,
-      125,  124,  123,  122,  121,  120,  119,  118,  117,   93,
-       93,  116,  115,   93,   93,  114,  113,   93,   93,  110,
-       93,   81,   75,   75,  109,  104,  103,   98,   95,   93,
-       94,   93,   92,   91,   90,   89,   88,   87,   86,   85,
-       84,   83,   82,   81,   79,   38,   38,   75,   35,   35,
-       35,   74,   73,   72,   71,   66,   65,   62,   51,   50,
-
-       44,   38,   35,  154,    3,  154,  154,  154,  154,  154,
-      154,  154,  154,  154,  154,  154,  154,  154,  154,  154,
-      154,  154,  154,  154,  154,  154,  154,  154,  154,  154,
-      154,  154,  154,  154,  154,  154,  154,  154,  154,  154,
-      154,  154,  154,  154,  154,  154,  154,  154,  154,  154,
-      154,  154
+        4,    5,    6,    7,    7,    7,    8,    7,    7,   10,
+       15,   14,   13,   12,    9,   11,    9,   16,    3,   16,
+       16,   16,   16,   16,   16,   16,   16,   16
     } ;
 
-static yyconst flex_int16_t yy_chk[353] =
+static yyconst flex_int16_t yy_chk[29] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    8,    8,  159,
-        8,    8,    8,    8,    8,    8,    8,    8,    8,    8,
-        8,    8,    8,    8,    8,    8,    8,    8,    8,    8,
-        8,    8,    8,    8,    8,    8,    8,    8,    8,    8,
-        8,    8,    8,    8,    8,    8,    8,    8,    8,    8,
-        8,    8,    8,    8,   10,   13,   20,   14,   13,   14,
-
-       22,   21,   22,   20,   23,   25,   66,   23,   42,   20,
-       21,   22,   25,   28,   28,   42,   48,   66,   48,  158,
-       73,   72,   73,   28,  155,   10,   28,   41,   41,   72,
-       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
-       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
-       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
-       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
-       41,   41,   41,   41,   68,   69,   86,   86,  153,  152,
-      151,  150,  149,  148,  147,  146,  145,  144,  143,  142,
-       69,   68,  156,  141,  156,  156,  157,  157,  160,  140,
-
-      160,  160,  161,  139,  161,  161,  138,  137,  136,  135,
-      134,  133,  132,  131,  130,  129,  128,  127,  126,  125,
-      124,  123,  122,  121,  120,  119,  118,  117,  116,  115,
-      114,  113,  112,  111,  110,  109,  108,  107,  106,  105,
-      104,  103,  102,  101,  100,   99,   98,   97,   96,   95,
-       94,   92,   91,   90,   89,   88,   87,   85,   84,   83,
-       82,   81,   76,   75,   74,   71,   70,   67,   65,   64,
-       62,   61,   60,   59,   58,   57,   56,   55,   54,   53,
-       52,   51,   50,   47,   43,   38,   37,   36,   35,   34,
-       33,   32,   31,   30,   29,   27,   26,   24,   19,   18,
-
-       12,    7,    4,    3,  154,  154,  154,  154,  154,  154,
-      154,  154,  154,  154,  154,  154,  154,  154,  154,  154,
-      154,  154,  154,  154,  154,  154,  154,  154,  154,  154,
-      154,  154,  154,  154,  154,  154,  154,  154,  154,  154,
-      154,  154,  154,  154,  154,  154,  154,  154,  154,  154,
-      154,  154
+        1,    1,    1,    1,    1,    1,    1,    1,    1,   17,
+       14,   13,   12,   11,    9,    8,    6,    3,   16,   16,
+       16,   16,   16,   16,   16,   16,   16,   16
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -584,161 +461,10 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "cdprojph1.l"
-#line 2 "cdprojph1.l"
-#include<stdio.h>
-#include<string.h>
-int c=0;
-int l=0;
-int comment_stack[100];//for storing comment stack
-int stacktop=-1;//top of comment stack
-int commentflag=0;//check if thing is inside commnet
-//hash function
-unsigned long hash(unsigned char *str)
-{
-    unsigned long hash = 5381;
-    int c;
-
-    while (c = *str++)
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
-    return hash;
-}
-
-//symbol table
-struct symbol{
-int valid;
-char name[100];
-char type[100];
-int lineno[100];
-int linecount;
-struct symbol *next;
-} symboltable[65535];
-
-//constants table
-struct constants{
-int valid;
-char name[100];
-char type[100];
-int lineno[100];
-int linecount;
-struct constants *next;
-} constantstable[65535];
-
-//no of constants
-int countconstants=0;
-int countsymbol=0;
-//function to add symbol to symbol table
-void push_to_symbol_table(char ctemp[],unsigned long map,char type[])
-{
-	if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)==0) //case when the symbol is already in table first
-	{
-		
-		symboltable[map].lineno[symboltable[map].linecount]=l;
-		symboltable[map].linecount++;
-
-	}
-	else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)//case when symbol not in table first
-	{
-		int found=0;
-		struct symbol * pointer=&symboltable[map];
-		while(pointer->next!=NULL)
-		{
-			if(strcmp(pointer->name,ctemp)==0)				
-				{
-					found=1;
-				}
-				pointer=pointer->next;
-		}
-		if(found==0)													////case when symbol not found
-		{
-			struct symbol * tempsymbol;
-			strncpy(tempsymbol->name,yytext,yyleng);
-			strcpy(tempsymbol->type,type);
-			tempsymbol->linecount=0;
-			tempsymbol->valid=1;
-			tempsymbol->next=NULL;
-			tempsymbol->lineno[tempsymbol->linecount]=l;
-			tempsymbol->linecount++;
-			pointer->next=tempsymbol;
-		}
-		if(found==1)													//case when symbol found at some other position
-		{
-			pointer->lineno[pointer->linecount]=l;
-			pointer->linecount++;
-
-		}
-
-	}
-	else{														   //hashtable map is free
-		strncpy(symboltable[map].name,yytext,yyleng);
-		strcpy(symboltable[map].type,type);
-		symboltable[map].linecount=0;
-		symboltable[map].valid=1;
-		symboltable[map].next=NULL;
-		symboltable[map].lineno[symboltable[map].linecount]=l;
-		symboltable[map].linecount++;
-		++countsymbol;
-		}
-		
-
-
-}
-//function to add constants to constant table
-void push_to_constants_table(char ctemp[],unsigned long map,char type[])								//case when the symbol is already in table first
-{
-	if(constantstable[map].valid==1&&strcmp(constantstable[map].name,ctemp)==0)
-			{
-				constantstable[map].lineno[constantstable[map].linecount]=l;
-				constantstable[map].linecount++;
-				
-
-			}
-			else if(constantstable[map].valid==1&&strcmp(constantstable[map].name,ctemp)!=0)		//case when symbol not in table first
-			{
-				int found=0;
-				struct constants * pointer=&constantstable[map];
-				while(pointer->next!=NULL)
-				{
-					if(strcmp(pointer->name,ctemp)==0)
-						{
-							found=1;
-						}
-					pointer=pointer->next;
-				}
-				if(found==0)														////case when symbol not found
-				{
-					struct constants * tempconstants;
-					strncpy(tempconstants->name,yytext,yyleng);
-					strcpy(tempconstants->type,type);
-					tempconstants->linecount=0;
-					tempconstants->valid=1;
-					tempconstants->next=NULL;
-					tempconstants->lineno[tempconstants->linecount]=l;
-					tempconstants->linecount++;
-					pointer->next=tempconstants;
-				}
-				if(found==1)													//case when symbol found at some other position				
-				{
-					pointer->lineno[pointer->linecount]=l;
-					pointer->linecount++;
-
-				}
-
-			}
-			else{																				//hashtable map is free
-				strncpy(constantstable[map].name,yytext,yyleng);
-				strcpy(constantstable[map].type,type);
-				constantstable[map].linecount=0;
-				constantstable[map].valid=1;
-				constantstable[map].next=NULL;
-				constantstable[map].lineno[constantstable[map].linecount]=l;
-				constantstable[map].linecount++;
-				++countconstants;
-				}
-}
-
-#line 742 "lex.yy.c"
+#line 1 "lex1.l"
+#line 2 "lex1.l"
+#include"y.tab.h"
+#line 468 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -952,9 +678,9 @@ YY_DECL
 		}
 
 	{
-#line 175 "cdprojph1.l"
+#line 8 "lex1.l"
 
-#line 958 "lex.yy.c"
+#line 684 "lex.yy.c"
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
@@ -981,13 +707,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 155 )
+				if ( yy_current_state >= 17 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 305 );
+		while ( yy_base[yy_current_state] != 19 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -1012,303 +738,32 @@ do_action:	/* This label is used only to access EOF actions. */
 			goto yy_find_action;
 
 case 1:
-/* rule 1 can match eol */
 YY_RULE_SETUP
-#line 176 "cdprojph1.l"
-{
-	++l;	//increment line count
-	}
+#line 9 "lex1.l"
+{return ID;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 179 "cdprojph1.l"
-{}
+#line 10 "lex1.l"
+{return NUM;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 180 "cdprojph1.l"
-{
-	if(commentflag==0){
-	char ctemp[100];
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_symbol_table(ctemp,map,"pre processor directory");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-	
-}
+#line 11 "lex1.l"
+yytext[0];
 	YY_BREAK
 case 4:
+/* rule 4 can match eol */
 YY_RULE_SETUP
-#line 196 "cdprojph1.l"
-{
-if(commentflag==0){
-	char ctemp[100];
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_symbol_table(ctemp,map,"openParanthesis");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-}
+#line 12 "lex1.l"
+return 0;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 210 "cdprojph1.l"
-{
-if(commentflag==0){
-	char ctemp[100];
-	strcpy(ctemp," ");
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_symbol_table(ctemp,map,"closeparanthesis");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-}
-	YY_BREAK
-case 6:
-YY_RULE_SETUP
-#line 225 "cdprojph1.l"
-{
-	stacktop++;
-	comment_stack[stacktop]=1;
-	commentflag=1;
-	printf("comment start at %d :",l);
-}
-	YY_BREAK
-case 7:
-YY_RULE_SETUP
-#line 231 "cdprojph1.l"
-{
-	if(stacktop==-1){
-		printf("comment error at %d \n", l);
-	}
-	else{
-		stacktop--;
-		if(stacktop==-1)
-			{
-				printf("comment end at %d \n", l);
-				commentflag=0;
-				printf("\n");
-			}
-	}
-}
-	YY_BREAK
-case 8:
-YY_RULE_SETUP
-#line 245 "cdprojph1.l"
-{
-	if(commentflag==0){
-	printf("comment :%s at %d\n",yytext,l);
-		
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-		++l;
-}
-	YY_BREAK
-case 9:
-YY_RULE_SETUP
-#line 256 "cdprojph1.l"
-{
-if(commentflag==0){
-	char ctemp[100];
-	strcpy(ctemp," ");
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_constants_table(ctemp,map,"integer constant");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-	printf("%s",yytext);
-	}
-}
-	YY_BREAK
-case 10:
-YY_RULE_SETUP
-#line 271 "cdprojph1.l"
-{
-if(commentflag==0){
-	char ctemp[100];
-	strcpy(ctemp," ");
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_constants_table(ctemp,map,"float constant");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-}
-	YY_BREAK
-case 11:
-YY_RULE_SETUP
-#line 286 "cdprojph1.l"
-{
-if(commentflag==0){
-	char ctemp[100];
-	strcpy(ctemp," ");
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_constants_table(ctemp,map,"character constant");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-}
-	YY_BREAK
-case 12:
-YY_RULE_SETUP
-#line 301 "cdprojph1.l"
-{
-if(commentflag==0){
-	char ctemp[100];
-	strcpy(ctemp," ");
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_constants_table(ctemp,map,"string constant");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-}
-	YY_BREAK
-case 13:
-YY_RULE_SETUP
-#line 316 "cdprojph1.l"
-{	
-if(commentflag==0){
-	char ctemp[100];
-	strcpy(ctemp," ");
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_symbol_table(ctemp,map,"special symbols");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-}
-	YY_BREAK
-case 14:
-YY_RULE_SETUP
-#line 331 "cdprojph1.l"
-{
-}
-	YY_BREAK
-case 15:
-YY_RULE_SETUP
-#line 333 "cdprojph1.l"
-{
-if(commentflag==0){
-	char ctemp[100];
-	strcpy(ctemp," ");
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_symbol_table(ctemp,map,"keywords");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-}
-	YY_BREAK
-case 16:
-YY_RULE_SETUP
-#line 348 "cdprojph1.l"
-{
-if(commentflag==0){
-	char ctemp[100];
-	strcpy(ctemp," ");
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_symbol_table(ctemp,map,"operator");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-}
-	YY_BREAK
-case 17:
-YY_RULE_SETUP
-#line 363 "cdprojph1.l"
-{
-if(commentflag==0){
-printf("Error:Invalid Identifier%s\n ",yytext);
-}
-else{
-printf("%s",yytext);
-}
-
-}
-	YY_BREAK
-case 18:
-YY_RULE_SETUP
-#line 372 "cdprojph1.l"
-{ 
-if(commentflag==0){
-	char ctemp[100];
-	strcpy(ctemp," ");
-	strncpy(ctemp,yytext,yyleng);
-	unsigned long map=hash(ctemp);
-	map=map%65535;
-	push_to_symbol_table(ctemp,map,"identifier");
-	memset(&ctemp[0], 0, sizeof(ctemp));
-	}
-	else
-	{
-		printf("%s",yytext);
-	}
-}
-	YY_BREAK
-case 19:
-YY_RULE_SETUP
-#line 387 "cdprojph1.l"
-{
-	if(commentflag==0){
-		printf("error at %s  %d\n",yytext,l);
-	}
-}
-	YY_BREAK
-case 20:
-YY_RULE_SETUP
-#line 392 "cdprojph1.l"
+#line 13 "lex1.l"
 ECHO;
 	YY_BREAK
-#line 1312 "lex.yy.c"
+#line 767 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1601,7 +1056,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 155 )
+			if ( yy_current_state >= 17 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1629,11 +1084,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 155 )
+		if ( yy_current_state >= 17 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 154);
+	yy_is_jam = (yy_current_state == 16);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2303,78 +1758,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 391 "cdprojph1.l"
+#line 12 "lex1.l"
 
-
-int main(int argc, char** argv)
-{
-	char cfile[10];
-	strcpy(cfile,argv[1]);
-	yyin=fopen(cfile,"r");
-	yylex();
-	if(stacktop!=-1)
-	{
-		printf("comment doesnt match\n");
-	}
-	printf("\n\t\t\t\t\tsymbols table\n");
-	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","linecount","linenumbers");
-	for(int i=0;i<65535;++i)
-	{
-			if(symboltable[i].valid==1)
-			{
-				struct symbol * pointer=&symboltable[i];
-				while(pointer->next!=NULL)
-					{
-						printf("%d \t\t %s \t\t %s \t\t %d ",i,pointer->name,pointer->type,pointer->linecount);
-						for(int j=0;j<pointer->linecount;++j)
-						{
-							printf("\t%d ",pointer->lineno[j]);
-						}
-							pointer=pointer->next;
-						
-					}
-				printf("%d \t\t %s \t\t %s\t\t %d ",i,pointer->name,pointer->type,pointer->linecount);
-						for(int j=0;j<pointer->linecount;++j)
-						{
-							printf("\t%d ",pointer->lineno[j]);
-						}
-							pointer=pointer->next;
-			
-				printf("\n");
-			}
-	}
-	printf("\n\n\t\t\t\t\tconstant table\n");
-	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","linecount","linenumbers");
-	for(int i=0;i<65535;++i)
-	{
-			if(constantstable[i].valid==1)
-			{
-				struct constants * pointer=&constantstable[i];
-				while(pointer->next!=NULL)
-					{
-						printf("%d \t\t %s \t\t %s \t\t %d ",i,pointer->name,pointer->type,pointer->linecount);
-						for(int j=0;j<pointer->linecount;++j)
-						{
-							printf("\t%d ",pointer->lineno[j]);
-						}
-						pointer=pointer->next;
-						
-					}
-				printf("%d \t\t %s \t\t %s \t\t %d ",i,pointer->name,pointer->type,pointer->linecount);
-				for(int j=0;j<pointer->linecount;++j)
-				{
-					printf("\t%d ",pointer->lineno[j]);
-				}
-				pointer=pointer->next;
-				printf("\n");
-			}
-	}
-	printf("count of lines is %d\n",l);
-	return 0;
-}
-int yywrap()
-{
-	return(1);
-}
 
 
