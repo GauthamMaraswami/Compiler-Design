@@ -62,7 +62,10 @@ extern int yydebug;
     floatcnst = 272,
     stringcnst = 273,
     breakval = 274,
-    returnval = 275
+    returnval = 275,
+    switchval = 276,
+    casestmt = 277,
+    defaultstmt = 278
   };
 #endif
 /* Tokens.  */
@@ -84,6 +87,9 @@ extern int yydebug;
 #define stringcnst 273
 #define breakval 274
 #define returnval 275
+#define switchval 276
+#define casestmt 277
+#define defaultstmt 278
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -97,7 +103,7 @@ union YYSTYPE
 	char cval;
   char* sval;
 
-#line 101 "y.tab.h" /* yacc.c:1909  */
+#line 107 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

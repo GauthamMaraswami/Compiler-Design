@@ -7,10 +7,13 @@ num [0-9]+
 floatconst [0-9]+[\.][0-9]+
 charconst [a-z|A-Z]
 strings ["].*["]
-dtype int|float|char
+dtype void|int|float|char
 if if
 else else
 while while
+switch switch
+case case
+default default
 break  break
 return return
 assignmentgroup =|\+=|\-=|\*=|\/=|%=
@@ -64,6 +67,24 @@ char res[100];
 	yylval.sval = res;
 	return whilestmt;
 }
+{switch} {
+char res[100];
+	strcpy(res, yytext);
+	yylval.sval = res;
+	return switchval;
+}
+{case} {
+char res[100];
+	strcpy(res, yytext);
+	yylval.sval = res;
+	return casestmt;
+}
+{default} {
+char res[100];
+	strcpy(res, yytext);
+	yylval.sval = res;
+	return defaultstmt;
+}
 {dtype} {
 char res[100];
 	strcpy(res, yytext);
@@ -80,6 +101,7 @@ char res[100];
 char res[100];
 	strcpy(res, yytext);
 	yylval.sval = res;
+printf("eurekha");
 return ID;}
 {assignmentgroup} {
 char res[100];

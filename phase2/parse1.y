@@ -24,6 +24,9 @@
 %token <sval> stringcnst
 %token <sval> breakval
 %token <sval> returnval
+%token <sval> switchval
+%token <sval> casestmt
+%token <sval> defaultstmt
 %{
 	#include<stdio.h>
 %}
@@ -39,6 +42,7 @@ program:expressionsemi
 |selectionstmt
 |iterationwhile
 |calling
+|switch
 ;
 declarationList: declarationList declaration
 |declaration
@@ -72,17 +76,20 @@ paramList: typeSpecifier ' ' varDeclId ','paramList
 ;
  
 statement: '{' stmtlist '}'
+|'{''}'
 ;
 
 loopstatement: '{'loopstmtlist'}'
+|'{''}'
 ;
-stmtlist: stmtlist expressionsemi
+stmtlist:stmtlist expressionsemi
 |stmtlist varDeclaration
 |expressionsemi
 |varDeclaration
 |selectionstmt
 |iterationwhile
 |returnstmt
+|switch
 ;
 returnstmt: returnval ';'
 |returnval ' ' simpleExpression ';'
@@ -149,8 +156,17 @@ args:
 arglist:arglist','expression
 |expression
 ;
-
-
+switch:switchval '(' expression ')' '{' switchstatement '}'
+;
+switchstatement:
+| casestmt ' ' switchimmutable ':' loopstmtlist switchstatement
+|casestmt ' ' switchimmutable ':' '{' loopstmtlist '}' switchstatement
+|defaultstmt ':' loopstmtlist
+|defaultstmt ':' '{'loopstmtlist'}'
+;
+switchimmutable:NUM
+|charcnst
+;	
 %%
 void yyerror()
 {
