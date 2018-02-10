@@ -31,7 +31,7 @@ int main()
             printf("yay");
             j+3;
             i+1;
-            j-2;
+            j-k;
             j++;
             i++;
         }

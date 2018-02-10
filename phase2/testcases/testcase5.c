@@ -9,7 +9,8 @@ int main()
     scanf("%d",&choice);
     switch(choice)
     {
-        case 1 : printf("%d",a||b); break;
+        case 1 : printf("%d",a||b); 
+		break;
         case 2 : printf("%d",a&&b); break;
     }
     return 0;

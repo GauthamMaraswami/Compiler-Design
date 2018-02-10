@@ -65,7 +65,9 @@ extern int yydebug;
     returnval = 275,
     switchval = 276,
     casestmt = 277,
-    defaultstmt = 278
+    structs = 278,
+    unions = 279,
+    defaultstmt = 280
   };
 #endif
 /* Tokens.  */
@@ -89,7 +91,9 @@ extern int yydebug;
 #define returnval 275
 #define switchval 276
 #define casestmt 277
-#define defaultstmt 278
+#define structs 278
+#define unions 279
+#define defaultstmt 280
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -101,9 +105,9 @@ union YYSTYPE
 	int ival;
 	float fval;
 	char cval;
-  char* sval;
+  char sval[100];
 
-#line 107 "y.tab.h" /* yacc.c:1909  */
+#line 111 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
