@@ -82,7 +82,7 @@ ID '[' NUM ']'
 typeSpecifier:dtype { printf( "yacc found datatype an: %s \n" ,$1); }
 ;
 
-funDeclaration: typeSpecifier ' ' ID '(' params ')' statement {printf("caught hete");}
+funDeclaration: typeSpecifier  ID '(' params ')' statement {printf("caught hete");}
 ;
 
 params: 

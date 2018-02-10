@@ -3,7 +3,7 @@
 #include<string.h>
 #include <stdlib.h>
 %}
-space [\ ]|\t
+space [\ ]*|\t*
 line \n
 num [0-9]+
 floatconst [0-9]+[\.][0-9]+
@@ -146,3 +146,7 @@ return relop;}
 \n return 0;
 . return yytext[0];
 %% 
+int yywrap(void)
+{
+    return 1;
+}
