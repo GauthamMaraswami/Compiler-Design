@@ -29,6 +29,7 @@
 %token <sval> defaultstmt
 %{
 	#include<stdio.h>
+	FILE *yyin;
 %}
 %%
 
@@ -44,17 +45,34 @@ program:expressionsemi
 |calling
 |switch
 ;
-declarationList: declarationList declaration
-|declaration
+
+
+declarationList:declaration declarationListhelper
 ;
+declarationListhelper:
+|declaration declarationListhelper
+;
+
+
+
+
 declaration: varDeclaration
 |funDeclaration
 ;
-varDeclaration: typeSpecifier ' ' varDeclList ';'
+varDeclaration: typeSpecifier varDeclList ';'
 ;
-varDeclList:varDeclList','varDeclInitialize 
-|varDeclInitialize
+
+varDeclList:varDeclInitialize varDeclListhelper
 ;
+varDeclListhelper:
+|','varDeclInitialize varDeclListhelper
+;
+
+
+
+
+
+
 varDeclInitialize:varDeclId
 ;
 varDeclId:ID 
@@ -91,6 +109,8 @@ stmtlist:stmtlist expressionsemi
 |returnstmt
 |switch
 ;
+
+
 returnstmt: returnval ';'
 |returnval ' ' simpleExpression ';'
 ;
@@ -156,6 +176,10 @@ args:
 arglist:arglist','expression
 |expression
 ;
+
+
+
+
 switch:switchval '(' expression ')' '{' switchstatement '}'
 ;
 switchstatement:
@@ -172,8 +196,9 @@ void yyerror()
 {
 	printf("Invalid expressions : \n");
 }
-main()
+int main()
 {
-	printf("Enter expression : ");
+	yyin=fopen("tester.c","r");
 	yyparse();
+	return 0;
 }

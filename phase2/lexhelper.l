@@ -3,9 +3,11 @@
 #include<string.h>
 #include <stdlib.h>
 %}
+space [\ ]|\t
+line \n
 num [0-9]+
 floatconst [0-9]+[\.][0-9]+
-charconst [a-z|A-Z]
+charconst ['][a-z|A-Z][']
 strings ["].*["]
 dtype void|int|float|char
 if if
@@ -25,6 +27,8 @@ logicalnot !
 relop >|<|<=|>=|==|!=
 ID [a-zA-Z][a-zA-Z0-9]*
 %%
+{space} {}
+{line} {}
 {num} {
 yylval.ival=atoi(yytext);
 return NUM;}
