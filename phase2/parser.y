@@ -26,17 +26,23 @@
 %token <sval> returnval
 %token <sval> switchval
 %token <sval> casestmt
+%token <sval> structs
+%token <sval> unions
 %token <sval> defaultstmt
+%type <sval> varDeclaration
 %type<sval>statement
 %type<sval>typeSpecifier
 %type<sval>params
 %type<sval>funDeclaration
 %type<sval>funName
+%type<sval>structorunion
+
 %{
 	#include<stdio.h>
 #include<string.h>
 	FILE *yyin;
 	extern int line;
+	char test[100];
 unsigned long hash(unsigned char *str)
 {
     unsigned long hash = 5381;
@@ -213,10 +219,10 @@ declarationListhelper:
 
 
 
-declaration: varDeclaration
+declaration: varDeclaration  
 |funDeclaration
 ;
-varDeclaration: typeSpecifier varDeclList ';'
+varDeclaration: typeSpecifier varDeclList ';'   {printf("%s\n%s\n",$1,test);}
 ;
 
 varDeclList:varDeclInitialize varDeclListhelper
@@ -232,11 +238,11 @@ varDeclListhelper:
 
 varDeclInitialize:varDeclId
 ;
-varDeclId:ID {printf("%s",$1); push_to_symbol_table($1,"data",line);}
+varDeclId:ID {printf("%s",$1); push_to_symbol_table($1,test,line);}
 |
-ID '[' NUM ']' {printf("%s",$1); push_to_symbol_table($1,"dataarr",line);push_to_constants_table($3,"function",line);}
+ID '[' NUM ']' {printf("%s",$1); push_to_symbol_table($1,test,line);push_to_constants_table($3,"number",line);}
 ;
-typeSpecifier:dtype  {$$="hai";}
+typeSpecifier:dtype  {$$=$1;strcpy(test,$1);}
 ;
 
 funDeclaration: typeSpecifier funName '(' params ')' statement {}
@@ -252,7 +258,7 @@ paramList: typeSpecifier varDeclId ','paramList
 ;
  
 statement: '{' stmtlist '}' {$$="null";}
-|'{''}'
+|'{''}' {$$="null";}
 ;
 
 loopstatement: '{'loopstmtlist'}'
@@ -323,7 +329,7 @@ mutable:mutable'['simpleExpression']'
 |mutable'['unary mutable']'
 |mutable'['mutable unary']'
 |'&' ID {printf("%s",$2);  push_to_symbol_table($2,"data",line); }
-|ID	{printf("%s",$1);  }
+|ID	{printf("\n%skkk\n",$1);
 ;
 
 
@@ -356,6 +362,7 @@ switchstatement:
 switchimmutable:NUM {printf("%s",$1); push_to_constants_table($1,"function",line);}
 |charcnst {printf("%s",$1); push_to_constants_table($1,"function",line);}
 ;	
+
 %%
 void yyerror()
 {

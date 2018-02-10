@@ -18,6 +18,8 @@ floatconst [0-9]+[\.][0-9]+
 charconst ['][a-z|A-Z][']
 strings ["].*["]
 dtype void|int|float|char
+struct struct
+union union
 if if
 else else
 while while
@@ -117,6 +119,16 @@ if(commentflag==0)
 {char res[100];
 	strcpy(res, yytext);
 	yylval.sval = res;return dtype;}
+}
+{struct} {
+char res[100];
+	strcpy(res, yytext);
+	yylval.sval = res;return structs;
+}
+{union} {
+char res[100];
+	strcpy(res, yytext);
+	yylval.sval = res;return unions;
 }
 {break} {
 char res[100];
