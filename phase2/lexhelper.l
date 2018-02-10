@@ -2,7 +2,15 @@
 #include"y.tab.h"
 #include<string.h>
 #include <stdlib.h>
+int line=1;
+int comment_stack[100];//for storing comment stack
+int stacktop=-1;//top of comment stack
+int commentflag=0;//check if thing is inside commnet
 %}
+preprocessordirective #.*
+single_line_comments \/\/.*
+multi_line_comments_start \/\*
+multi_line_comments_end \*\/
 space [\ ]*|\t*
 line \n
 num [0-9]+
@@ -28,21 +36,36 @@ relop >|<|<=|>=|==|!=
 ID [a-zA-Z][a-zA-Z0-9]*
 %%
 {space} {}
-{line} {}
+{line} {
+++line;
+}
+{preprocessordirective} {
+}
+{multi_line_comments_start} {
+
+}
+{multi_line_comments_end} {
+
+}
+{single_line_comments}	{
+++line;
+
+}
 {num} {
-yylval.ival=atoi(yytext);
+	char res[100];
+	strcpy(res, yytext);
+	yylval.sval = res;
 return NUM;}
 {charconst} {
-char res;
+	char res[100];
 	strcpy(res, yytext);
-	yylval.cval = res;
+	yylval.sval = res;
 	return charcnst;
 }
 {floatconst} {
 char res[100];
 	strcpy(res, yytext);
 	yylval.sval = res;
-	printf("if");
 	return floatcnst;
 }
 {strings} {
@@ -90,9 +113,11 @@ char res[100];
 	return defaultstmt;
 }
 {dtype} {
-char res[100];
+if(commentflag==0)
+{char res[100];
 	strcpy(res, yytext);
 	yylval.sval = res;return dtype;}
+}
 {break} {
 char res[100];
 	strcpy(res, yytext);
@@ -102,11 +127,13 @@ char res[100];
 	strcpy(res, yytext);
 	yylval.sval = res;return returnval;}
 {ID} {
+if(commentflag==0){
 char res[100];
 	strcpy(res, yytext);
 	yylval.sval = res;
-printf("eurekha");
+//printf("eurekha");
 return ID;}
+}
 {assignmentgroup} {
 char res[100];
 	strcpy(res, yytext);
@@ -143,8 +170,10 @@ char res[100];
 	strcpy(res, yytext);
 	yylval.sval = res;
 return relop;}
-\n return 0;
-. return yytext[0];
+. {
+
+	return yytext[0];
+}
 %% 
 int yywrap(void)
 {
