@@ -378,8 +378,8 @@ switchstatement:
 |defaultstmt ':' loopstmtlist
 |defaultstmt ':''{'loopstmtlist'}'
 ;
-switchimmutable:NUM {printf("%s",$1); push_to_constants_table($1,"number",line);}
-|charcnst {printf("%s",$1); push_to_constants_table($1,"number",line);}
+switchimmutable:NUM {printf("%s",$1); push_to_constants_table($1,"function",line);}
+|charcnst {printf("%s",$1); push_to_constants_table($1,"function",line);}
 |sumop NUM
 |sumop ID
 |ID

@@ -1,123 +1,37 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
-
-/* Bison interface for Yacc-like parsers in C
-
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
-
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
-
-/* As a special exception, you may create a larger work that contains
-   part or all of the Bison parser skeleton and distribute that work
-   under terms of your choice, so long as that work isn't itself a
-   parser generator using the skeleton or a modified version thereof
-   as a parser skeleton.  Alternatively, if you modify or redistribute
-   the parser skeleton itself, you may (at your option) remove this
-   special exception, which will cause the skeleton and the resulting
-   Bison output files to be licensed under the GNU General Public
-   License without this special exception.
-
-   This special exception was added by the Free Software Foundation in
-   version 2.2 of Bison.  */
-
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
+#define ID 257
+#define NUM 258
+#define dtype 259
+#define assop 260
+#define sumop 261
+#define mulop 262
+#define unary 263
+#define logicalopbin 264
+#define logicalnot 265
+#define relop 266
+#define ifstmt 267
+#define elsestmt 268
+#define whilestmt 269
+#define charcnst 270
+#define floatcnst 271
+#define stringcnst 272
+#define breakval 273
+#define returnval 274
+#define switchval 275
+#define casestmt 276
+#define structs 277
+#define unions 278
+#define defaultstmt 279
+#ifdef YYSTYPE
+#undef  YYSTYPE_IS_DECLARED
+#define YYSTYPE_IS_DECLARED 1
 #endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token type.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    ID = 258,
-    NUM = 259,
-    dtype = 260,
-    assop = 261,
-    sumop = 262,
-    mulop = 263,
-    unary = 264,
-    logicalopbin = 265,
-    logicalnot = 266,
-    relop = 267,
-    ifstmt = 268,
-    elsestmt = 269,
-    whilestmt = 270,
-    charcnst = 271,
-    floatcnst = 272,
-    stringcnst = 273,
-    breakval = 274,
-    returnval = 275,
-    switchval = 276,
-    casestmt = 277,
-    structs = 278,
-    unions = 279,
-    defaultstmt = 280
-  };
-#endif
-/* Tokens.  */
-#define ID 258
-#define NUM 259
-#define dtype 260
-#define assop 261
-#define sumop 262
-#define mulop 263
-#define unary 264
-#define logicalopbin 265
-#define logicalnot 266
-#define relop 267
-#define ifstmt 268
-#define elsestmt 269
-#define whilestmt 270
-#define charcnst 271
-#define floatcnst 272
-#define stringcnst 273
-#define breakval 274
-#define returnval 275
-#define switchval 276
-#define casestmt 277
-#define structs 278
-#define unions 279
-#define defaultstmt 280
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
-union YYSTYPE
-{
-#line 2 "parser.y" /* yacc.c:1909  */
-
+#ifndef YYSTYPE_IS_DECLARED
+#define YYSTYPE_IS_DECLARED 1
+typedef union {
 	int ival;
 	float fval;
 	char cval;
   char sval[100];
-
-#line 111 "y.tab.h" /* yacc.c:1909  */
-};
-
-typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
-
-
+} YYSTYPE;
+#endif /* !YYSTYPE_IS_DECLARED */
 extern YYSTYPE yylval;
-
-int yyparse (void);
-
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
