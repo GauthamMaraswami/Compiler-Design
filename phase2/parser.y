@@ -307,36 +307,36 @@ expressionsemi:expression ';'
 |mutable assop sumop NUM ';' 
 |mutable assop sumop ID ';'
 ;
-expression: mutable assop expression  {printf("14\n");}
-|simpleExpression 					{printf("15\n");}
+expression: mutable assop expression  { /*printf( " found assignment an:   %s\n" ,$2); */}
+|simpleExpression 
 |unary mutable 
 |mutable unary
 ;
-simpleExpression: simpleExpression logicalopbin unaryRelExpression		{printf("12\n");}
-|unaryRelExpression 		{printf("13\n");}
+simpleExpression: simpleExpression logicalopbin unaryRelExpression
+|unaryRelExpression 
 ;
 
-unaryRelExpression: logicalnot unaryRelExpression  {printf("10\n");}
-|relExpression			{printf("11\n");}
+unaryRelExpression: logicalnot unaryRelExpression
+|relExpression
 ;
-relExpression:sumExpression relop sumExpression	{printf("8\n");}
-|sumExpression		{printf("9\n");}
-;
-
-sumExpression:sumExpression sumop term {printf("7\n");}
-|term					{printf("6\n");}
+relExpression:sumExpression relop sumExpression
+|sumExpression
 ;
 
-term:term mulop factor {printf("4\n");}
-|factor					{printf("5\n");}
+sumExpression:sumExpression sumop term 
+|term
+;
+
+term:term mulop factor 
+|factor
 ;
 
 iterationwhile:whilestmt'('simpleExpression')'loopstatement
 ;
 
-factor:immutable   {printf("1\n");}
-|mutable			{printf("2\n");}
-|'('simpleExpression')'  {printf("3\n");}
+factor:immutable
+|mutable
+|'('simpleExpression')'
 |callingnosq
 ;
 
