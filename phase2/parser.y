@@ -307,36 +307,37 @@ expressionsemi:expression ';'
 |mutable assop sumop NUM ';' 
 |mutable assop sumop ID ';'
 ;
-expression: mutable assop expression  { /*printf( " found assignment an:   %s\n" ,$2); */}
-|simpleExpression 
+expression: mutable assop expression  {printf("14\n");}
+|simpleExpression 					{printf("15\n");}
 |unary mutable 
 |mutable unary
-|callingnosq
 ;
-simpleExpression: simpleExpression logicalopbin unaryRelExpression
-|unaryRelExpression 
-;
-
-unaryRelExpression: logicalnot unaryRelExpression
-|relExpression
-;
-relExpression:sumExpression relop sumExpression
-|sumExpression
+simpleExpression: simpleExpression logicalopbin unaryRelExpression		{printf("12\n");}
+|unaryRelExpression 		{printf("13\n");}
 ;
 
-sumExpression:sumExpression sumop term 
-|term
+unaryRelExpression: logicalnot unaryRelExpression  {printf("10\n");}
+|relExpression			{printf("11\n");}
+;
+relExpression:sumExpression relop sumExpression	{printf("8\n");}
+|sumExpression		{printf("9\n");}
 ;
 
-term:term mulop factor
-|factor
+sumExpression:sumExpression sumop term {printf("7\n");}
+|term					{printf("6\n");}
+;
+
+term:term mulop factor {printf("4\n");}
+|factor					{printf("5\n");}
 ;
 
 iterationwhile:whilestmt'('simpleExpression')'loopstatement
 ;
 
-factor:immutable
-|mutable
+factor:immutable   {printf("1\n");}
+|mutable			{printf("2\n");}
+|'('simpleExpression')'  {printf("3\n");}
+|callingnosq
 ;
 
 mutable:mutable'['simpleExpression']'
@@ -393,7 +394,7 @@ void yyerror()
 int main()
 {
     int i,j;
-	yyin=fopen("testcases/testcase5.c","r");
+	yyin=fopen("tester.c","r");
 	yyparse();
 	printf("\n\t\t\t\t\tsymbols table\n");
 	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","linecount","linenumbers");
