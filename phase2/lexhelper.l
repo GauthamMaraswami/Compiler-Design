@@ -1,11 +1,11 @@
 %{
-#include"y.tab.h"
-#include<string.h>
-#include <stdlib.h>
-int line=1;
-int comment_stack[100];//for storing comment stack
-int stacktop=-1;//top of comment stack
-int commentflag=0;//check if thing is inside commnet
+	#include"y.tab.h"
+	#include<string.h>
+	#include <stdlib.h>
+	int line=1;
+	int comment_stack[100];//for storing comment stack
+	int stacktop=-1;//top of comment stack
+	int commentflag=0;//check if thing is inside commnet
 %}
 preprocessordirective #.*
 single_line_comments \/\/.*
@@ -46,7 +46,7 @@ ID [a-zA-Z][a-zA-Z0-9]*
 {preprocessordirective} {
 }
 {multi_line_comments_start} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
 	stacktop++;
 	comment_stack[stacktop]=1;
@@ -64,24 +64,26 @@ if(commentflag==0)
 
 }
 {single_line_comments}	{
-++line;
+	++line;
 
 }
 {num} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-	char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-return NUM;}}
-{charconst} {
-if(commentflag==0)
-	{
-	char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return charcnst;
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return NUM;
+	}
 }
+{charconst} {
+	if(commentflag==0)
+	{
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return charcnst;
+	}	
 }
 {badcharcnst} {
 if(commentflag==0)
@@ -90,52 +92,52 @@ if(commentflag==0)
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
 	return badcharcnst;
-}
+	}
 }
 {floatconst} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return floatcnst;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return floatcnst;
+	}
 }
 {strings} {
 if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return stringcnst;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return stringcnst;
+	}
 }
 {if} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return ifstmt;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return ifstmt;
+	}
 }
 {else} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return elsestmt;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return elsestmt;
+	}
 }
 {while} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return whilestmt;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return whilestmt;
+	}
 }
 {switch} {
 if(commentflag==0)
@@ -147,138 +149,151 @@ char res[100];
 }
 }
 {case} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return casestmt;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return casestmt;
+	}
 }
 {default} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return defaultstmt;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return defaultstmt;
+	}
 }
 {dtype} {
-if(commentflag==0)
-{char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);return dtype;}
+	if(commentflag==0)
+	{
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return dtype;
+	}
 }
 {structs} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);return structs;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+	return structs;
+	}
 }
 {unions} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);return unions;
-}}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return unions;
+	}
+}
 {break} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);return breakval;}}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return breakval;
+	}
+}
 {return} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);return returnval;}}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return returnval;
+	}
+}
 {ID} {
-if(commentflag==0){
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-//printf("eurekha");
-return ID;}
+	if(commentflag==0)
+	{
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return ID;
+	}
 }
 {otherdefinedsymbols} {
 	if(commentflag==0)
 	{	
-	return yytext[0];
+		return yytext[0];
 	}
 }
 {assignmentgroup} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-	char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return assop;
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return assop;
 	}
 }
 {unary} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-return unary;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return unary;
+	}
 }
 {sumoperator} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-return sumop;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return sumop;
+	}
 }
 {multoperator} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-return mulop;
-}
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return mulop;
+	}
 }
 {logicalopbin} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-	char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return logicalopbin;
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return logicalopbin;
 	}
 }
 {logicalnot} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-return logicalnot;
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return logicalnot;
 	}
 }
 {relop} {
-if(commentflag==0)
+	if(commentflag==0)
 	{
-	char res[100];
-	strcpy(res, yytext);
-	strcpy(yylval.sval,res);
-	return relop;
+		char res[100];
+		strcpy(res, yytext);
+		strcpy(yylval.sval,res);
+		return relop;
 	}
 }
 . {
 	if(commentflag==0)
 	{	
-	printf("lexixal error at %d\n",line);
-	return yytext[0];
+		printf("lexixal error at %d\n",line);
+		return yytext[0];
 	}
 	
 }
