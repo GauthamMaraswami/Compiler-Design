@@ -16,7 +16,7 @@ int main(int abc,int cde){
 	a=100;
 	while(stmt<10);
 	int z;
-	z=a*b+c&&d-e/f;
+	z=a*b+c&&d-e/f
 	funct("anana");
 	funct("and","rand",aks);
 }

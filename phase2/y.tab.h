@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 3.0.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -59,15 +59,16 @@ extern int yydebug;
     elsestmt = 269,
     whilestmt = 270,
     charcnst = 271,
-    floatcnst = 272,
-    stringcnst = 273,
-    breakval = 274,
-    returnval = 275,
-    switchval = 276,
-    casestmt = 277,
-    structs = 278,
-    unions = 279,
-    defaultstmt = 280
+    badcharcnst = 272,
+    floatcnst = 273,
+    stringcnst = 274,
+    breakval = 275,
+    returnval = 276,
+    switchval = 277,
+    casestmt = 278,
+    structs = 279,
+    unions = 280,
+    defaultstmt = 281
   };
 #endif
 /* Tokens.  */
@@ -85,19 +86,20 @@ extern int yydebug;
 #define elsestmt 269
 #define whilestmt 270
 #define charcnst 271
-#define floatcnst 272
-#define stringcnst 273
-#define breakval 274
-#define returnval 275
-#define switchval 276
-#define casestmt 277
-#define structs 278
-#define unions 279
-#define defaultstmt 280
+#define badcharcnst 272
+#define floatcnst 273
+#define stringcnst 274
+#define breakval 275
+#define returnval 276
+#define switchval 277
+#define casestmt 278
+#define structs 279
+#define unions 280
+#define defaultstmt 281
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
+typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
 #line 2 "parser.y" /* yacc.c:1909  */
@@ -105,12 +107,10 @@ union YYSTYPE
 	int ival;
 	float fval;
 	char cval;
-  char sval[100];
+  	char sval[100];
 
-#line 111 "y.tab.h" /* yacc.c:1909  */
+#line 113 "y.tab.h" /* yacc.c:1909  */
 };
-
-typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

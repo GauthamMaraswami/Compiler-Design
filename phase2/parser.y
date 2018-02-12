@@ -3,7 +3,7 @@
 	int ival;
 	float fval;
 	char cval;
-  char sval[100];
+  	char sval[100];
 }
 
 %token <sval> ID
@@ -20,6 +20,7 @@
 %token <sval> elsestmt
 %token <sval> whilestmt
 %token <sval> charcnst
+%token <sval> badcharcnst
 %token <sval> floatcnst
 %token <sval> stringcnst
 %token <sval> breakval
@@ -250,7 +251,7 @@ typeSpecifier:dtype  {strcpy($$,$1);strcpy(test,$1);}
 
 funDeclaration: typeSpecifier funName '(' params ')' statement {}
 ;
-funName:ID {strcpy($$,$1);  push_to_symbol_table($1,"function",line);}
+funName:ID {strcpy($$,$1);  push_to_symbol_table($1,test,line);}
 ;
 params: 
 |paramList 
@@ -300,6 +301,7 @@ loopstmtlist:stmtlist expressionsemi
 ;
 breakstmt:breakval ';'
 selectionstmt:ifstmt '(' simpleExpression ')' statement
+|ifstmt '(' simpleExpression ')' statement ';'
 |ifstmt '(' simpleExpression ')' statement elsestmt  selectionhelper
 ;
 selectionhelper: selectionstmt
@@ -325,21 +327,22 @@ relExpression:sumExpression relop sumExpression
 |sumExpression
 ;
 
-sumExpression:sumExpression sumop term 
+sumExpression:sumExpression sumop term  {printf("add\n");}
 |term
 ;
 
-term:term mulop factor
+term:term mulop factor	 {printf("multiply\n");}
 |factor
 ;
 
 iterationwhile:whilestmt'('simpleExpression')'loopstatement
+|whilestmt'('simpleExpression')' ';'
 ;
 
 factor:immutable
-|mutable
-|'('simpleExpression')'
-|callingnosq
+|mutable		{printf("mutable\n");}
+|'('simpleExpression')'  {printf("brackets\n");}
+|callingnosq	 {printf("calling\n");}
 ;
 
 mutable:mutable'['simpleExpression']'
@@ -354,6 +357,7 @@ immutable:NUM	{ push_to_constants_table($1,"number",line);}
 |charcnst	{ push_to_constants_table($1,"character",line);}
 |stringcnst	{ push_to_constants_table($1,"string",line);}
 |floatcnst	{ push_to_constants_table($1,"float",line);}
+|badcharcnst	{ push_to_constants_table($1,"character",line);}
 ;
 
 
