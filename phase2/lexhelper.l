@@ -34,6 +34,7 @@ sumoperator  [\+|\-]
 multoperator [\*|%|/]
 logicalopbin &&|\|\|
 logicalnot !
+otherdefinedsymbols [{]|[}]|;|\(|\)|\]|\[|,|&|:
 relop >|<|<=|>=|==|!=
 ID [a-zA-Z][a-zA-Z0-9]*
 %%
@@ -44,9 +45,21 @@ ID [a-zA-Z][a-zA-Z0-9]*
 {preprocessordirective} {
 }
 {multi_line_comments_start} {
+if(commentflag==0)
+	{
+	stacktop++;
+	comment_stack[stacktop]=1;
+	commentflag=1;
+	}
 
 }
 {multi_line_comments_end} {
+	if(commentflag==1){
+		commentflag=0;
+	}
+	else{
+		printf("lexixal error at %d\n",line);
+	}
 
 }
 {single_line_comments}	{
@@ -54,65 +67,92 @@ ID [a-zA-Z][a-zA-Z0-9]*
 
 }
 {num} {
+if(commentflag==0)
+	{
 	char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
-return NUM;}
+return NUM;}}
 {charconst} {
+if(commentflag==0)
+	{
 	char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
 	return charcnst;
 }
+}
 {floatconst} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
 	return floatcnst;
 }
+}
 {strings} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
-	printf("if");
 	return stringcnst;
 }
+}
 {if} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
-	printf("if");
 	return ifstmt;
 }
+}
 {else} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
 	return elsestmt;
 }
+}
 {while} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
 	return whilestmt;
 }
+}
 {switch} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
 	return switchval;
 }
+}
 {case} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
 	return casestmt;
 }
+}
 {default} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
 	return defaultstmt;
+}
 }
 {dtype} {
 if(commentflag==0)
@@ -121,23 +161,32 @@ if(commentflag==0)
 	strcpy(yylval.sval,res);return dtype;}
 }
 {structs} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);return structs;
 }
+}
 {unions} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);return unions;
-}
+}}
 {break} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
-	strcpy(yylval.sval,res);return breakval;}
+	strcpy(yylval.sval,res);return breakval;}}
 {return} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
-	strcpy(yylval.sval,res);return returnval;}
+	strcpy(yylval.sval,res);return returnval;}}
 {ID} {
 if(commentflag==0){
 char res[100];
@@ -146,45 +195,82 @@ char res[100];
 //printf("eurekha");
 return ID;}
 }
+{otherdefinedsymbols} {
+	if(commentflag==0)
+	{	
+	return yytext[0];
+	}
+}
 {assignmentgroup} {
-char res[100];
+if(commentflag==0)
+	{
+	char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
-return assop;}
+	return assop;
+	}
+}
 {unary} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
 return unary;
 }
+}
 {sumoperator} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
-return sumop;}
+return sumop;
+}
+}
 {multoperator} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
-return mulop;}
+return mulop;
+}
+}
 {logicalopbin} {
-char res[100];
+if(commentflag==0)
+	{
+	char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
-return logicalopbin;}
+	return logicalopbin;
+	}
+}
 {logicalnot} {
+if(commentflag==0)
+	{
 char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
-return logicalnot;}
+return logicalnot;
+	}
+}
 {relop} {
-char res[100];
+if(commentflag==0)
+	{
+	char res[100];
 	strcpy(res, yytext);
 	strcpy(yylval.sval,res);
-return relop;}
+	return relop;
+	}
+}
 . {
-
+	if(commentflag==0)
+	{	
+	printf("lexixal error at %d\n",line);
 	return yytext[0];
+	}
+	
 }
 %% 
 int yywrap(void)

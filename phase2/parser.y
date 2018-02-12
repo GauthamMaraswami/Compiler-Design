@@ -40,6 +40,9 @@
 #include<string.h>
 	FILE *yyin;
 	extern int line;
+extern int comment_stack[100];//for storing comment stack
+extern int stacktop;//top of comment stack
+extern int commentflag;
 	char test[100];
 unsigned long hash(unsigned char *str)
 {
@@ -202,9 +205,8 @@ ED:program
 program:expressionsemi
 |declarationList
 |selectionstmt
-|iterationwhile
-|switch
 |structoruniondefn
+|structoruniondefn program
 ;
 
 
@@ -220,8 +222,8 @@ declarationListhelper:
 declaration: varDeclaration  
 |funDeclaration
 ;
-varDeclaration: typeSpecifier varDeclList ';'   {printf("%sakakak\n%s\n",$1,test);}
-|structspecifier ID varDeclList ';'  {printf("%s\n%s\n",$1,test);}
+varDeclaration: typeSpecifier varDeclList ';'  
+|structspecifier ID varDeclList ';' 
 ;
 
 varDeclList:varDeclInitialize varDeclListhelper
@@ -239,16 +241,16 @@ varDeclarationStmt:
 
 varDeclInitialize:varDeclId
 ;
-varDeclId:ID {printf("%s",$1); push_to_symbol_table($1,test,line);}
+varDeclId:ID { push_to_symbol_table($1,test,line);}
 |
-ID '[' NUM ']' {printf("%s",$1); push_to_symbol_table($1,test,line);push_to_constants_table($3,"number",line);}
+ID '[' NUM ']' { push_to_symbol_table($1,test,line);push_to_constants_table($3,"number",line);}
 ;
 typeSpecifier:dtype  {strcpy($$,$1);strcpy(test,$1);}
 ;
 
 funDeclaration: typeSpecifier funName '(' params ')' statement {}
 ;
-funName:ID {strcpy($$,$1); printf("%s",$1); push_to_symbol_table($1,"function",line);}
+funName:ID {strcpy($$,$1);  push_to_symbol_table($1,"function",line);}
 ;
 params: 
 |paramList 
@@ -342,15 +344,15 @@ factor:immutable
 mutable:mutable'['simpleExpression']'
 |mutable'['unary mutable']'
 |mutable'['mutable unary']'
-|'&' ID {printf("%s",$2);  push_to_symbol_table($2,"data",line); }
-|ID	{printf("\n%skkk\n",$1);}
+|'&' ID { push_to_symbol_table($2,"data",line); }
+|ID	
 ;
 
 
-immutable:NUM	{printf("%s",$1); push_to_constants_table($1,"number",line);}
-|charcnst	{printf("%s",$1); push_to_constants_table($1,"character",line);}
-|stringcnst	{printf("%s",$1); push_to_constants_table($1,"string",line);}
-|floatcnst	{printf("%s",$1); push_to_constants_table($1,"float",line);}
+immutable:NUM	{ push_to_constants_table($1,"number",line);}
+|charcnst	{ push_to_constants_table($1,"character",line);}
+|stringcnst	{ push_to_constants_table($1,"string",line);}
+|floatcnst	{ push_to_constants_table($1,"float",line);}
 ;
 
 
@@ -363,7 +365,7 @@ arglist:arglist','expression
 |expression
 ;
 
-structoruniondefn: structspecifier ID '{' varDeclarationStmt '}' ';'{"reaching";}
+structoruniondefn: structspecifier ID '{' varDeclarationStmt '}' ';'
 ;
 
 structspecifier:structs  {strcpy($$,$1); strcpy(test,$1);}
@@ -378,8 +380,8 @@ switchstatement:
 |defaultstmt ':' loopstmtlist
 |defaultstmt ':''{'loopstmtlist'}'
 ;
-switchimmutable:NUM {printf("%s",$1); push_to_constants_table($1,"number",line);}
-|charcnst {printf("%s",$1); push_to_constants_table($1,"number",line);}
+switchimmutable:NUM {push_to_constants_table($1,"number",line);}
+|charcnst { push_to_constants_table($1,"number",line);}
 |sumop NUM
 |sumop ID
 |ID
@@ -388,12 +390,16 @@ switchimmutable:NUM {printf("%s",$1); push_to_constants_table($1,"number",line);
 %%
 void yyerror()
 {
-	printf("Invalid expressions at line %d : \n",line);
+	if(commentflag==1)
+		printf("lexical comment error  at line %d : \n",line);
+	else{
+		printf("Invalid expressions at line %d : \n",line);
+	}
 }
 int main()
 {
     int i,j;
-	yyin=fopen("testcases/testcase5.c","r");
+	yyin=fopen("tester.c","r");
 	yyparse();
 	printf("\n\t\t\t\t\tsymbols table\n");
 	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","linecount","linenumbers");
