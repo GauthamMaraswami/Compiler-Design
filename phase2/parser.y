@@ -313,7 +313,6 @@ expression: mutable assop expression  { /*printf( " found assignment an:   %s\n"
 |simpleExpression 
 |unary mutable 
 |mutable unary
-|callingnosq
 ;
 simpleExpression: simpleExpression logicalopbin unaryRelExpression
 |unaryRelExpression 
@@ -340,6 +339,7 @@ iterationwhile:whilestmt'('simpleExpression')'loopstatement
 factor:immutable
 |mutable
 |'('simpleExpression')'
+|callingnosq
 ;
 
 mutable:mutable'['simpleExpression']'
