@@ -339,6 +339,7 @@ iterationwhile:whilestmt'('simpleExpression')'loopstatement
 
 factor:immutable
 |mutable
+|'('simpleExpression')'
 ;
 
 mutable:mutable'['simpleExpression']'
