@@ -1902,12 +1902,9 @@ int main()
 				struct symbol * pointer=&symboltable[i];
 				while(pointer->next!=NULL)
 					{
-					printf("%d \t\t %s \t\t %s \t\t %s \t\t %d ",i,pointer->name,pointer->type,pointer->scope,pointer->linecount);
+					printf("%d \t\t %s \t\t %s \t\t %s \t\t %d\n ",i,pointer->name,pointer->type,pointer->scope,pointer->linecount);
 						
-						for(j=0;j<pointer->linecount;++j)
-						{
-							printf("\t%d ",pointer->lineno[j]);
-						}
+						
 							pointer=pointer->next;
 						
 					}

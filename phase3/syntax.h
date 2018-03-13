@@ -48,9 +48,39 @@ unsigned long hash(unsigned char *str)
 		unsigned long map=hash(ctemp);
 		map=map%65535;
 		int len=strlen(ctemp);
-		if(symboltable[map].valid==1&&(strcmp(symboltable[map].name,ctemp)==0)&&strcmp(symboltable[map].scope,scope)==0) //case when the symbol is already in table first
+		if(symboltable[map].valid==1&&(strcmp(symboltable[map].name,ctemp)==0)) //case when the symbol is already in table first
 		{
-			printf("error");
+			int found=0;
+			struct symbol * pointer= (struct symbol *) malloc( sizeof(struct symbol));
+			pointer=&symboltable[map];
+			if(strcmp(symboltable[map].scope,scope)==0)
+			{
+				found=1;
+			}
+			while(pointer->next!=NULL)
+			{
+				if(strcmp(pointer->scope,scope)==0)				
+					{
+						found=1;
+					}
+			}
+			if(found==1)
+			{
+				printf("error");
+			}
+			else{
+				struct symbol * tempsymbol=(struct symbol *) malloc( sizeof(struct symbol));
+				strncpy(tempsymbol->name,ctemp,len);
+				strcpy(tempsymbol->type,type);
+				tempsymbol->linecount=0;
+				tempsymbol->valid=1;
+				tempsymbol->next=NULL;
+				tempsymbol->lineno[tempsymbol->linecount]=l;
+				tempsymbol->linecount++;
+				strcpy(tempsymbol->scope,scope);
+				pointer->next=tempsymbol;	
+			}
+
 			symboltable[map].lineno[symboltable[map].linecount]=l;
 			symboltable[map].linecount++;
 
@@ -220,7 +250,7 @@ struct string openbraceencounter(struct string id)
     else if(stackrep!=-1)
         {
             int temp=stackrep;
-			 printf("\ngot from stack%d\n",temp);
+			// printf("\ngot from stack%d\n",temp);
             temp++;
            	stackrep=-1;
             struct string temp1;
@@ -235,7 +265,7 @@ struct string openbraceencounter(struct string id)
 struct string closebraceencounter(struct string id)
 {
     int temp = converttoint(id);
-     printf("\nstack pushed val%d\n",(temp%10));
+     //printf("\nstack pushed val%d\n",(temp%10));
    // pushtostack(scopecount,(temp%10));
 	stackrep=temp%10;
     temp=temp/10;
