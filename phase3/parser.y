@@ -32,13 +32,14 @@
 %token <sval> defaultstmt
 %type <sval> varDeclaration
 %type <sval>typeSpecifier
-%type <sval>funDeclaration
 %type <sval>funName
 %type <sval>structspecifier
 
 %{
 	#include<stdio.h>
 	#include<string.h>
+	#include <stdlib.h>
+	#include <limits.h>
 	#include "syntax.h"
 	FILE *yyin;
 	extern int line;
@@ -46,7 +47,9 @@
 	extern int stacktop;//top of comment stack
 	extern int commentflag;
 	char test[100];
-	
+    struct string id;
+	struct string id_prev;
+	int brac_act_flag=0;
 
 %}
 %%
@@ -95,16 +98,23 @@ varDeclarationStmt:
 
 varDeclInitialize:varDeclId
 ;
-varDeclId:ID { push_to_symbol_table($1,test,line);}
+varDeclId:ID { push_to_symbol_table($1,test,id.val,line); printf("%s  %s  \n",$1,id.val);}
 |
-ID '[' NUM ']' { push_to_symbol_table($1,test,line);push_to_constants_table($3,"number",line);}
+ID '[' NUM ']' { push_to_symbol_table($1,test,id.val,line);push_to_constants_table($3,"number",line);  printf("%s  %s  \n",$1,id.val);}
 ;
 typeSpecifier:dtype  {strcpy($$,$1);strcpy(test,$1);}
 ;
 
-funDeclaration: typeSpecifier funName '(' params ')' statement {}
+funDeclaration: funDeclarationphase1 statement 
 ;
-funName:ID {strcpy($$,$1);  push_to_symbol_table($1,test,line);}
+
+funDeclarationphase1: funDeclarationphase2 ')' { brac_act_flag=1; }
+;
+funDeclarationphase2: funDeclarationphase3 params 
+;
+funDeclarationphase3: typeSpecifier funName '('  {  id=openbraceencounter(id); }
+;
+funName:ID {strcpy($$,$1);  push_to_symbol_table($1,test,id.val,line);printf("%s  %s  \n",$1,id.val); }
 ;
 params: 
 |paramList 
@@ -114,12 +124,12 @@ paramList: typeSpecifier varDeclId ','paramList
 |typeSpecifier varDeclId
 ;
  
-statement:  statement1 '}' {printf("close");}
-| statement2 '}' {printf("close");}
+statement:  statement1 '}' {printf("close");id=closebraceencounter(id);}
+| statement2 '}' {printf("close");id=closebraceencounter(id);}
 ;
 statement1: statement2 stmtlist
 ;
-statement2: '{'{printf("open");}
+statement2: '{' {printf("open"); if(brac_act_flag==0) {id=openbraceencounter(id);} else {brac_act_flag=0;} }
 ;
 
 
@@ -127,9 +137,16 @@ statement2: '{'{printf("open");}
 
 
 
-loopstatement: '{'loopstmtlist'}'
-|'{''}'
+loopstatement: loopstatement1 '}'  {printf("close"); id=closebraceencounter(id);}
+|statement2 '}' {printf("close");id=closebraceencounter(id);}
 ;
+
+loopstatement1: statement2 loopstmtlist
+;
+
+
+
+
 stmtlist:stmtlist expressionsemi
 |stmtlist varDeclaration
 |expressionsemi
@@ -189,11 +206,11 @@ relExpression:sumExpression relop sumExpression
 |sumExpression
 ;
 
-sumExpression:sumExpression sumop term  {printf("add\n");}
+sumExpression:sumExpression sumop term  {/*printf("add\n");*/}
 |term
 ;
 
-term:term mulop factor	 {printf("multiply\n");}
+term:term mulop factor	 {/*printf("multiply\n");*/}
 |factor
 ;
 
@@ -202,15 +219,15 @@ iterationwhile:whilestmt'('simpleExpression')'loopstatement
 ;
 
 factor:immutable
-|mutable		{printf("mutable\n");}
-|'('simpleExpression')'  {printf("brackets\n");}
-|callingnosq	 {printf("calling\n");}
+|mutable		{/*printf("mutable\n");*/}
+|'('simpleExpression')'  {/*printf("brackets\n");*/}
+|callingnosq	 {/*printf("calling\n");*/}
 ;
 
 mutable:mutable'['simpleExpression']'
 |mutable'['unary mutable']'
 |mutable'['mutable unary']'
-|'&' ID { push_to_symbol_table($2,"data",line); }
+|'&' ID { push_to_symbol_table($2,"data",id.val,line); printf("%s  %s  \n",$2,id.val); }
 |ID	
 ;
 
@@ -266,15 +283,17 @@ void yyerror()
 
 int main()
 {
-    int i,j;
-	
 
+    int i,j;
+	id.val[0]='1';
+	id.len=1;
+	id.val[id.len]='\0';
 
 	yyin=fopen("tester.c","r");
 	yyparse();
-/*
+
 	printf("\n\t\t\t\t\tsymbols table\n");
-	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","linecount","linenumbers");
+	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","scope","linecount");
 	for(i=0;i<65535;++i)
 	{
 			if(symboltable[i].valid==1)
@@ -282,7 +301,8 @@ int main()
 				struct symbol * pointer=&symboltable[i];
 				while(pointer->next!=NULL)
 					{
-						printf("%d \t\t %s \t\t %s \t\t %d ",i,pointer->name,pointer->type,pointer->linecount);
+					printf("%d \t\t %s \t\t %s \t\t %s \t\t %d ",i,pointer->name,pointer->type,pointer->scope,pointer->linecount);
+						
 						for(j=0;j<pointer->linecount;++j)
 						{
 							printf("\t%d ",pointer->lineno[j]);
@@ -290,7 +310,8 @@ int main()
 							pointer=pointer->next;
 						
 					}
-				printf("%d \t\t %s \t\t %s\t\t %d ",i,pointer->name,pointer->type,pointer->linecount);
+				printf("%d \t\t %s \t\t %s \t\t %s \t\t %d ",i,pointer->name,pointer->type,pointer->scope,pointer->linecount);
+						
 						for(j=0;j<pointer->linecount;++j)
 						{
 							printf("\t%d ",pointer->lineno[j]);
@@ -300,6 +321,7 @@ int main()
 				printf("\n");
 			}
 	}
+	/*
 printf("\n\n\t\t\t\t\tconstant table\n");
 	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","linecount","linenumbers");
 	for(i=0;i<65535;++i)

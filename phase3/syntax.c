@@ -5,8 +5,7 @@
 	int countconstants=0;
 	int countsymbol=0;
 
-
-	int stackrep=-1;
+	struct Stack* scopecount;
 
 unsigned long hash(unsigned char *str)
 	{
@@ -157,6 +156,12 @@ unsigned long hash(unsigned char *str)
 	}
 
 
+struct Stack
+{
+    int top;
+    unsigned capacity;
+    int* array;
+};
 
 struct string
 {
@@ -164,6 +169,43 @@ struct string
     int len;
 };
 
+
+struct Stack* createStack(unsigned capacity)
+{
+    struct Stack* stack = (struct Stack*) malloc(sizeof(struct Stack));
+    stack->capacity = capacity;
+    stack->top = -1;
+    stack->array = (int*) malloc(stack->capacity * sizeof(int));
+    return stack;
+}
+
+int isFull(struct Stack* stack)
+{   return stack->top == stack->capacity - 1;
+ }
+
+int isEmpty(struct Stack* stack)
+{   return stack->top == -1;  }
+ 
+void pushtostack(struct Stack* stack, int item)
+{
+    if (isFull(stack))
+        return;
+    stack->array[++stack->top] = item;
+    //printf("%d pushed to stack\n", item);
+}
+ 
+int pop(struct Stack* stack)
+{
+    if (isEmpty(stack))
+        return INT_MIN;
+    return stack->array[stack->top--];
+}
+int top(struct Stack* stack)
+{
+    if (isEmpty(stack))
+        return INT_MIN;
+    return stack->array[stack->top];
+}
 struct string converttostring(int temp)
 {
     struct string res,resrev;
@@ -211,18 +253,18 @@ struct string appendstring(struct string id,struct string temp1)
 
 struct string openbraceencounter(struct string id)
 {
-    if(stackrep==-1)
+    if(top(scopecount)==-1)
 		{
 		 	id.val[id.len]='1';	
             id.len++;
 			id.val[id.len]='\0';
         }
-    else if(stackrep!=-1)
+    else if(top(scopecount)!=-1)
         {
-            int temp=stackrep;
+            int temp=top(scopecount);
 			 printf("\ngot from stack%d\n",temp);
             temp++;
-           	stackrep=-1;
+            pop(scopecount);
             struct string temp1;
             temp1=converttostring(temp);
 			//printf("\nans%s\n",temp1.val);
@@ -236,8 +278,7 @@ struct string closebraceencounter(struct string id)
 {
     int temp = converttoint(id);
      printf("\nstack pushed val%d\n",(temp%10));
-   // pushtostack(scopecount,(temp%10));
-	stackrep=temp%10;
+    pushtostack(scopecount,(temp%10));
     temp=temp/10;
 	//printf("\ntempend%d\n",temp);
     id=converttostring(temp);
