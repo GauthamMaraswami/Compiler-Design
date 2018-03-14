@@ -130,9 +130,9 @@ funDeclarationphase1: funDeclarationphase2 ')' { brac_act_flag=1;strcpy($$,$1); 
 ;
 funDeclarationphase2: funDeclarationphase3 params {strcpy($$,$1);}
 ;
-funDeclarationphase3: typeSpecifier funName '('  {  id=openbraceencounter(id);  strcpy($$,$1);}
+funDeclarationphase3: typeSpecifier ID '('  { strcpy(funname_global,$2);  id=openbraceencounter(id);  strcpy($$,$1);}
 ;
-funName:ID {strcpy(funname_global,$1);   strcpy($$,$1);  /*printf("%s  %s  \n",$1,id.val);*/ }
+funName:ID {  }
 ;
 params: 
 |paramList 
@@ -267,7 +267,9 @@ immutable:NUM	{ push_to_constants_table($1,"number",line);}
 ;
 
 
-callingnosq:funName'('args')'	
+callingnosq:funName'('args')' {int ans=checkdeclarationfunction(id,$1); if(ans==0){printf("function %s is not declared in this scope at line %d \n",$1,line);}
+else if(ans==-1){printf("identifier %s not declared as procedure at line %d\n",$1,line);};
+}	
 ;
 args:
 |arglist

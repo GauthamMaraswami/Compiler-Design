@@ -76,7 +76,7 @@ unsigned long hash(unsigned char *str)
 			}
 			if(found==1)
 			{
-				printf("function already exists in the scope at line %d\n",l);
+				printf("Identifier %s already exists in the scope at line %d\n",ctemp,l);
 			}
 			else{
 				struct symbol * tempsymbol=(struct symbol *) malloc( sizeof(struct symbol));
@@ -370,6 +370,67 @@ int checkdeclaration(struct string idinp,char identifier[])
 			idinp.val[lengthofid]='\0';
 	}
 	//printf("notfound");
+			return 0;
+
+}
+int checkdeclarationfunction(struct string idinp,char identifier[])
+{
+	//printf("\n%s",identifier);
+	int len=strlen(identifier);
+	unsigned long  map=hash(identifier);
+	map=map%65535;
+	struct symbol ans= symboltable[map];
+	if(ans.valid==0)
+	{
+		//printf("not found");
+		
+		return 0;
+	}
+	int lengthofid=idinp.len;
+	while(lengthofid>=0)
+	{
+		//printf("+++%s---%s+++\n",idinp.val,ans.scope);
+			if(strcmp(ans.scope,idinp.val)==0)
+			{
+			//	printf("found");
+				if(ans.proc_defn_flag==0)
+			{
+				return -1;
+			}
+				return 1;
+			}
+			else{
+			struct symbol * pointer1= (struct symbol *) malloc( sizeof(struct symbol));
+			pointer1=&ans;
+			while(pointer1->next!=NULL)
+			{
+				//printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
+				if(strcmp(pointer1->scope,idinp.val)==0)				
+					{
+						if(ans.proc_defn_flag==0)
+						{
+							return -1;
+						}
+						return 1;
+						
+					}
+					pointer1=pointer1->next;
+			}
+			//printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
+			if(strcmp(pointer1->scope,idinp.val)==0)				
+					{
+						if(ans.proc_defn_flag==0)
+						{
+							return -1;
+						}
+						return 1;
+						
+					}
+	}
+	lengthofid--;
+			idinp.val[lengthofid]='\0';
+	}
+//	printf("notfound");
 			return 0;
 
 }
