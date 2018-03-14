@@ -103,8 +103,16 @@ varDeclarationStmt:
 varDeclInitialize:varDeclId
 ;
 varDeclId:ID { push_to_symbol_table($1,test,id.val,line); /*printf("%s  %s  \n",$1,id.val);*/}
-|
-ID '[' NUM ']' { push_to_symbol_table($1,test,id.val,line);push_to_constants_table($3,"number",line); /* printf("%s  %s  \n",$1,id.val)*/;}
+|ID '[' sumop NUM ']' {  
+							if(strcmp($3,"-")==0)
+							{
+								printf("array size cannot be negative at line %d \n",line);
+							}
+							else{					
+	push_to_symbol_table($1,test,id.val,line);push_to_constants_table($4,"number",line); }
+						}
+|ID '[' NUM ']'{ push_to_symbol_table($1,test,id.val,line);push_to_constants_table($3,"number",line); }
+						
 ;
 typeSpecifier:dtype  {strcpy($$,$1);strcpy(test,$1); }
 ;
