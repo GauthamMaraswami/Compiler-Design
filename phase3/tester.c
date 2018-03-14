@@ -1,12 +1,11 @@
 #include<stdio.h>
-void abc();
-int main()
+int main(int a,void b)
 {
 
    return 0;
        abc();
 }
-void abc()
+void abc(void a)
 {
 
 }

@@ -124,8 +124,8 @@ params:
 |paramList 
 ;
 
-paramList: typeSpecifier varDeclId ','paramList
-|typeSpecifier varDeclId
+paramList: typeSpecifier varDeclId ','paramList  {if(strcmp($1,"void")==0){printf("parameter cannot be void at line %d",line);}}
+|typeSpecifier varDeclId  {if(strcmp($1,"void")==0){printf("parameter cannot be void at line %d",line);}}
 ;
  
 statement:  statement1 '}' {/*printf("close");*/id=closebraceencounter(id);}
