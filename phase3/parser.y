@@ -254,7 +254,8 @@ mutable:mutable'['simpleExpression']'
 |mutable'['unary mutable']'
 |mutable'['mutable unary']'
 |'&' ID { push_to_symbol_table($2,"data",id.val,line,0,"0",parameter_list,0);/* printf("%s  %s  \n",$2,id.val); */}
-|ID	
+|ID	{ int ans=checkdeclaration(id,$1); if(ans==0){printf("variable %s is not declared in this scope at line %d \n",$1,line);}
+else if(ans==-1){printf("identifier %s previously defined as procedure at line %d\n",$1,line);}}
 ;
 
 

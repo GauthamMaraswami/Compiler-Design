@@ -510,9 +510,9 @@ static const yytype_uint16 yyrline[] =
      210,   212,   213,   215,   216,   217,   219,   220,   221,   222,
      224,   225,   228,   229,   231,   232,   235,   236,   239,   240,
      243,   244,   247,   248,   249,   250,   253,   254,   255,   256,
-     257,   261,   262,   263,   264,   265,   269,   271,   272,   274,
-     275,   278,   281,   282,   285,   287,   288,   289,   290,   291,
-     293,   294,   295,   296,   297
+     257,   262,   263,   264,   265,   266,   270,   272,   273,   275,
+     276,   279,   282,   283,   286,   288,   289,   290,   291,   292,
+     294,   295,   296,   297,   298
 };
 #endif
 
@@ -1651,62 +1651,69 @@ yyreduce:
 #line 1652 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 100:
+#line 257 "parser.y" /* yacc.c:1646  */
+    { int ans=checkdeclaration(id,(yyvsp[0].sval)); if(ans==0){printf("variable %s is not declared in this scope at line %d \n",(yyvsp[0].sval),line);}
+else if(ans==-1){printf("identifier %s previously defined as procedure at line %d\n",(yyvsp[0].sval),line);}}
+#line 1659 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 101:
-#line 261 "parser.y" /* yacc.c:1646  */
+#line 262 "parser.y" /* yacc.c:1646  */
     { push_to_constants_table((yyvsp[0].sval),"number",line);}
-#line 1658 "y.tab.c" /* yacc.c:1646  */
+#line 1665 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 102:
-#line 262 "parser.y" /* yacc.c:1646  */
+#line 263 "parser.y" /* yacc.c:1646  */
     { push_to_constants_table((yyvsp[0].sval),"character",line);}
-#line 1664 "y.tab.c" /* yacc.c:1646  */
+#line 1671 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 103:
-#line 263 "parser.y" /* yacc.c:1646  */
+#line 264 "parser.y" /* yacc.c:1646  */
     { push_to_constants_table((yyvsp[0].sval),"string",line);}
-#line 1670 "y.tab.c" /* yacc.c:1646  */
+#line 1677 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 104:
-#line 264 "parser.y" /* yacc.c:1646  */
+#line 265 "parser.y" /* yacc.c:1646  */
     { push_to_constants_table((yyvsp[0].sval),"float",line);}
-#line 1676 "y.tab.c" /* yacc.c:1646  */
+#line 1683 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 105:
-#line 265 "parser.y" /* yacc.c:1646  */
+#line 266 "parser.y" /* yacc.c:1646  */
     { push_to_constants_table((yyvsp[0].sval),"character",line);}
-#line 1682 "y.tab.c" /* yacc.c:1646  */
+#line 1689 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 112:
-#line 281 "parser.y" /* yacc.c:1646  */
+#line 282 "parser.y" /* yacc.c:1646  */
     {strcpy((yyval.sval),(yyvsp[0].sval)); strcpy(test,(yyvsp[0].sval));}
-#line 1688 "y.tab.c" /* yacc.c:1646  */
+#line 1695 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 113:
-#line 282 "parser.y" /* yacc.c:1646  */
+#line 283 "parser.y" /* yacc.c:1646  */
     {strcpy((yyval.sval),(yyvsp[0].sval));}
-#line 1694 "y.tab.c" /* yacc.c:1646  */
+#line 1701 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 120:
-#line 293 "parser.y" /* yacc.c:1646  */
+#line 294 "parser.y" /* yacc.c:1646  */
     {push_to_constants_table((yyvsp[0].sval),"number",line);}
-#line 1700 "y.tab.c" /* yacc.c:1646  */
+#line 1707 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 121:
-#line 294 "parser.y" /* yacc.c:1646  */
+#line 295 "parser.y" /* yacc.c:1646  */
     { push_to_constants_table((yyvsp[0].sval),"number",line);}
-#line 1706 "y.tab.c" /* yacc.c:1646  */
+#line 1713 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1710 "y.tab.c" /* yacc.c:1646  */
+#line 1717 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1934,7 +1941,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 300 "parser.y" /* yacc.c:1906  */
+#line 301 "parser.y" /* yacc.c:1906  */
 
 void yyerror()
 {
