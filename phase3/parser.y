@@ -37,6 +37,7 @@
 %type <sval>funDeclarationphase1
 %type <sval>funDeclarationphase2
 %type <sval>funDeclarationphase3
+%type <sval>varDeclId
 
 %{
 	#include<stdio.h>
@@ -54,6 +55,9 @@
 	struct string id_prev;
 	int brac_act_flag=0;
 	int return_not_void_flag;
+	int parameter_count=0;
+	struct identifier parameter_list[100];
+	char funname_global[100];
 
 %}
 %%
@@ -102,22 +106,24 @@ varDeclarationStmt:
 
 varDeclInitialize:varDeclId
 ;
-varDeclId:ID { push_to_symbol_table($1,test,id.val,line); /*printf("%s  %s  \n",$1,id.val);*/}
-|ID '[' sumop NUM ']' {  
+varDeclId:ID { strcpy($$,$1);push_to_symbol_table($1,test,id.val,line,0,"0",parameter_list,0); /*printf("%s  %s  \n",$1,id.val);*/}
+|ID '[' sumop NUM ']' {  strcpy($$,$1);
 							if(strcmp($3,"-")==0)
 							{
 								printf("array size cannot be negative at line %d \n",line);
 							}
 							else{					
-	push_to_symbol_table($1,test,id.val,line);push_to_constants_table($4,"number",line); }
+	push_to_symbol_table($1,test,id.val,line,0,$4,parameter_list,0);push_to_constants_table($4,"number",line); }
 						}
-|ID '[' NUM ']'{ push_to_symbol_table($1,test,id.val,line);push_to_constants_table($3,"number",line); }
+|ID '[' NUM ']'{strcpy($$,$1); push_to_symbol_table($1,test,id.val,line,0,$3,parameter_list,0);push_to_constants_table($3,"number",line); }
 						
 ;
 typeSpecifier:dtype  {strcpy($$,$1);strcpy(test,$1); }
 ;
 
-funDeclaration: funDeclarationphase1 statement {if(strcmp($1,"void")==0&&return_not_void_flag==1){printf("return type mismatch error at line %d \n" ,line);} else if(strcmp($1,"void")!=0&&return_not_void_flag==0){printf("return type mismatch error at line %d \n" ,line);} return_not_void_flag=0;}
+funDeclaration: funDeclarationphase1 statement { push_to_symbol_table(funname_global,test,id.val,line,1,"0",parameter_list,parameter_count);
+	parameter_count=0;
+	if(strcmp($1,"void")==0&&return_not_void_flag==1){printf("return type mismatch error at line %d \n" ,line);} else if(strcmp($1,"void")!=0&&return_not_void_flag==0){printf("return type mismatch error at line %d \n" ,line);} return_not_void_flag=0;}
 ;
 
 funDeclarationphase1: funDeclarationphase2 ')' { brac_act_flag=1;strcpy($$,$1); }
@@ -126,14 +132,22 @@ funDeclarationphase2: funDeclarationphase3 params {strcpy($$,$1);}
 ;
 funDeclarationphase3: typeSpecifier funName '('  {  id=openbraceencounter(id);  strcpy($$,$1);}
 ;
-funName:ID {strcpy($$,$1);  push_to_symbol_table($1,test,id.val,line);/*printf("%s  %s  \n",$1,id.val);*/ }
+funName:ID {strcpy(funname_global,$1);   strcpy($$,$1);  /*printf("%s  %s  \n",$1,id.val);*/ }
 ;
 params: 
 |paramList 
 ;
 
-paramList: typeSpecifier varDeclId ','paramList  {if(strcmp($1,"void")==0){printf("parameter cannot be void at line %d",line);}}
-|typeSpecifier varDeclId  {if(strcmp($1,"void")==0){printf("parameter cannot be void at line %d",line);}}
+paramList: typeSpecifier varDeclId ','paramList  {         
+	strcpy(parameter_list[parameter_count].name,$2);
+	strcpy(parameter_list[parameter_count].type,$1);
+	++parameter_count;
+	if(strcmp($1,"void")==0){printf("parameter cannot be void at line %d",line);}}
+|typeSpecifier varDeclId  {
+	strcpy(parameter_list[parameter_count].name,$2);
+	strcpy(parameter_list[parameter_count].type,$1);
+	++parameter_count;
+	if(strcmp($1,"void")==0){printf("parameter cannot be void at line %d",line);}}
 ;
  
 statement:  statement1 '}' {/*printf("close");*/id=closebraceencounter(id);}
@@ -239,7 +253,7 @@ factor:immutable
 mutable:mutable'['simpleExpression']'
 |mutable'['unary mutable']'
 |mutable'['mutable unary']'
-|'&' ID { push_to_symbol_table($2,"data",id.val,line);/* printf("%s  %s  \n",$2,id.val); */}
+|'&' ID { push_to_symbol_table($2,"data",id.val,line,0,"0",parameter_list,0);/* printf("%s  %s  \n",$2,id.val); */}
 |ID	
 ;
 
@@ -303,9 +317,9 @@ int main()
 
 	yyin=fopen("tester.c","r");
 	yyparse();
-/*
+
 	printf("\n\t\t\t\t\tsymbols table\n");
-	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","scope","linecount");
+	printf("%s \t %s \t %s \t %s \t %s  %s \t %s \t %s   %s\n","ID","name","type","scope","linecount","fun_def_flag","array_dim","paramcount","parameters");
 	for(i=0;i<65535;++i)
 	{
 			if(symboltable[i].valid==1)
@@ -313,23 +327,23 @@ int main()
 				struct symbol * pointer=&symboltable[i];
 				while(pointer->next!=NULL)
 					{
-					printf("%d \t\t %s \t\t %s \t\t %s \t\t %d\n ",i,pointer->name,pointer->type,pointer->scope,pointer->linecount);
-						
-						
+					printf("%d \t %s \t %s \t %s \t %d \t\t %d \t\t %s \t\t %d \t\t",i,pointer->name,pointer->type,pointer->scope,pointer->linecount,pointer->proc_defn_flag,pointer->arraydimention,pointer->parameter_count);
+						for(int zz=0;zz<pointer->parameter_count;++zz)
+						{
+							printf("%s%s ",pointer->parameter_list[zz].type,pointer->parameter_list[zz].name);
+						}
+						printf("\n");
 							pointer=pointer->next;
 						
 					}
-				printf("%d \t\t %s \t\t %s \t\t %s \t\t %d ",i,pointer->name,pointer->type,pointer->scope,pointer->linecount);
-						
-						for(j=0;j<pointer->linecount;++j)
+				printf("%d \t %s \t %s \t %s \t %d \t\t %d \t\t %s \t\t %d \t\t",i,pointer->name,pointer->type,pointer->scope,pointer->linecount,pointer->proc_defn_flag,pointer->arraydimention,pointer->parameter_count);	
+					for(int zz=0;zz<pointer->parameter_count;++zz)
 						{
-							printf("\t%d ",pointer->lineno[j]);
+							printf("%s%s ",pointer->parameter_list[zz].type,pointer->parameter_list[zz].name);
 						}
-							pointer=pointer->next;
-			
 				printf("\n");
 			}
-	}*/
+	}
 	/*
 printf("\n\n\t\t\t\t\tconstant table\n");
 	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","linecount","linenumbers");

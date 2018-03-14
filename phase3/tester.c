@@ -1,11 +1,11 @@
 #include<stdio.h>
 int main(int a[-100])
 {
-    int a[-1];
+    int ar[1];
    return 0;
     
 }
-void abc()
+void abc(int z, int zebra)
 {
 
 }

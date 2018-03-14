@@ -18,7 +18,11 @@ unsigned long hash(unsigned char *str)
 
     		return hash;
 	}
-
+	//identifier structure
+	struct identifier{
+		char name[100];
+		char type[100];
+	};
 	//symbol table
 	struct symbol{
 	int valid;
@@ -26,9 +30,15 @@ unsigned long hash(unsigned char *str)
 	char type[100];
 	int lineno[100];
     char scope[100];
+	char arraydimention[10];
+	int proc_defn_flag;
+	int parameter_count;
+	struct identifier parameter_list[100];
 	int linecount;
 	struct symbol *next;
 	} symboltable[65535];
+
+
 
 	//constants table
 	struct constants{
@@ -43,7 +53,7 @@ unsigned long hash(unsigned char *str)
 	//no of constants
 
 	//function to add symbol to symbol table
-	void push_to_symbol_table(char ctemp[],char type[],char scope[],int l)
+	void push_to_symbol_table(char ctemp[],char type[],char scope[],int l,int fun_def_flag,char arr_dim[],struct identifier parameter_list[],int parameter_count )
 	{
 		unsigned long map=hash(ctemp);
 		map=map%65535;
@@ -77,6 +87,16 @@ unsigned long hash(unsigned char *str)
 				tempsymbol->next=NULL;
 				tempsymbol->lineno[tempsymbol->linecount]=l;
 				tempsymbol->linecount++;
+				tempsymbol->proc_defn_flag=fun_def_flag;
+				tempsymbol->parameter_count=parameter_count;
+				if(parameter_count>0)
+				{
+					for(int zz=0;zz<parameter_count;++zz)
+					{
+						tempsymbol->parameter_list[zz]=parameter_list[zz];
+					}
+				}
+				strcpy(tempsymbol->arraydimention,arr_dim);
 				strcpy(tempsymbol->scope,scope);
 				pointer->next=tempsymbol;	
 			}
@@ -124,6 +144,16 @@ unsigned long hash(unsigned char *str)
 			symboltable[map].linecount=0;
 			symboltable[map].valid=1;
 			symboltable[map].next=NULL;
+			symboltable[map].proc_defn_flag=fun_def_flag;
+			symboltable[map].parameter_count=parameter_count;
+			if(parameter_count>0)
+			{
+				for(int zz=0;zz<parameter_count;++zz)
+				{
+					symboltable[map].parameter_list[zz]=parameter_list[zz];
+				}
+			}
+			strcpy(symboltable[map].arraydimention,arr_dim);
 			strcpy(symboltable[map].scope,scope);
 			symboltable[map].lineno[symboltable[map].linecount]=l;
 			symboltable[map].linecount++;
