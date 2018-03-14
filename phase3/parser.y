@@ -34,6 +34,9 @@
 %type <sval>typeSpecifier
 %type <sval>funName
 %type <sval>structspecifier
+%type <sval>funDeclarationphase1
+%type <sval>funDeclarationphase2
+%type <sval>funDeclarationphase3
 
 %{
 	#include<stdio.h>
@@ -50,6 +53,7 @@
     struct string id;
 	struct string id_prev;
 	int brac_act_flag=0;
+	int return_not_void_flag;
 
 %}
 %%
@@ -98,23 +102,23 @@ varDeclarationStmt:
 
 varDeclInitialize:varDeclId
 ;
-varDeclId:ID { push_to_symbol_table($1,test,id.val,line); printf("%s  %s  \n",$1,id.val);}
+varDeclId:ID { push_to_symbol_table($1,test,id.val,line); /*printf("%s  %s  \n",$1,id.val);*/}
 |
-ID '[' NUM ']' { push_to_symbol_table($1,test,id.val,line);push_to_constants_table($3,"number",line);  printf("%s  %s  \n",$1,id.val);}
+ID '[' NUM ']' { push_to_symbol_table($1,test,id.val,line);push_to_constants_table($3,"number",line); /* printf("%s  %s  \n",$1,id.val)*/;}
 ;
-typeSpecifier:dtype  {strcpy($$,$1);strcpy(test,$1);}
-;
-
-funDeclaration: funDeclarationphase1 statement 
+typeSpecifier:dtype  {strcpy($$,$1);strcpy(test,$1); }
 ;
 
-funDeclarationphase1: funDeclarationphase2 ')' { brac_act_flag=1; }
+funDeclaration: funDeclarationphase1 statement {if(strcmp($1,"void")==0&&return_not_void_flag==1){printf("return type mismatch error at line %d \n" ,line);} else if(strcmp($1,"void")!=0&&return_not_void_flag==0){printf("return type mismatch error at line %d \n" ,line);} return_not_void_flag=0;}
 ;
-funDeclarationphase2: funDeclarationphase3 params 
+
+funDeclarationphase1: funDeclarationphase2 ')' { brac_act_flag=1;strcpy($$,$1); }
 ;
-funDeclarationphase3: typeSpecifier funName '('  {  id=openbraceencounter(id); }
+funDeclarationphase2: funDeclarationphase3 params {strcpy($$,$1);}
 ;
-funName:ID {strcpy($$,$1);  push_to_symbol_table($1,test,id.val,line);printf("%s  %s  \n",$1,id.val); }
+funDeclarationphase3: typeSpecifier funName '('  {  id=openbraceencounter(id);  strcpy($$,$1);}
+;
+funName:ID {strcpy($$,$1);  push_to_symbol_table($1,test,id.val,line);/*printf("%s  %s  \n",$1,id.val);*/ }
 ;
 params: 
 |paramList 
@@ -124,12 +128,12 @@ paramList: typeSpecifier varDeclId ','paramList
 |typeSpecifier varDeclId
 ;
  
-statement:  statement1 '}' {printf("close");id=closebraceencounter(id);}
-| statement2 '}' {printf("close");id=closebraceencounter(id);}
+statement:  statement1 '}' {/*printf("close");*/id=closebraceencounter(id);}
+| statement2 '}' {/*printf("close");*/id=closebraceencounter(id);}
 ;
-statement1: statement2 stmtlist
+statement1: statement2 stmtlist 
 ;
-statement2: '{' {printf("open"); if(brac_act_flag==0) {id=openbraceencounter(id);} else {brac_act_flag=0;} }
+statement2: '{' {/*printf("open");*/ if(brac_act_flag==0) {id=openbraceencounter(id);} else {brac_act_flag=0;} }
 ;
 
 
@@ -137,8 +141,8 @@ statement2: '{' {printf("open"); if(brac_act_flag==0) {id=openbraceencounter(id)
 
 
 
-loopstatement: loopstatement1 '}'  {printf("close"); id=closebraceencounter(id);}
-|statement2 '}' {printf("close");id=closebraceencounter(id);}
+loopstatement: loopstatement1 '}'  {/*printf("close");*/ id=closebraceencounter(id);}
+|statement2 '}' {/*printf("close");*/id=closebraceencounter(id);}
 ;
 
 loopstatement1: statement2 loopstmtlist
@@ -149,20 +153,20 @@ loopstatement1: statement2 loopstmtlist
 
 stmtlist:stmtlist expressionsemi
 |stmtlist varDeclaration
-|expressionsemi
-|varDeclaration
+|expressionsemi 
+|varDeclaration 
 |stmtlist selectionstmt
 |stmtlist iterationwhile
-|stmtlist returnstmt
-|stmtlist switch
-|switch
-|returnstmt
+|stmtlist returnstmt 
+|stmtlist switch 
+|switch 
+|returnstmt 
 |selectionstmt
 ;
 
 
-returnstmt: returnval ';'
-|returnval simpleExpression ';'
+returnstmt: returnval ';' {return_not_void_flag=1;}
+|returnval simpleExpression ';' {return_not_void_flag=1;}
 ;
 loopstmtlist:stmtlist expressionsemi
 |stmtlist varDeclaration
@@ -227,7 +231,7 @@ factor:immutable
 mutable:mutable'['simpleExpression']'
 |mutable'['unary mutable']'
 |mutable'['mutable unary']'
-|'&' ID { push_to_symbol_table($2,"data",id.val,line); printf("%s  %s  \n",$2,id.val); }
+|'&' ID { push_to_symbol_table($2,"data",id.val,line);/* printf("%s  %s  \n",$2,id.val); */}
 |ID	
 ;
 
@@ -291,7 +295,7 @@ int main()
 
 	yyin=fopen("tester.c","r");
 	yyparse();
-
+/*
 	printf("\n\t\t\t\t\tsymbols table\n");
 	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","scope","linecount");
 	for(i=0;i<65535;++i)
@@ -317,7 +321,7 @@ int main()
 			
 				printf("\n");
 			}
-	}
+	}*/
 	/*
 printf("\n\n\t\t\t\t\tconstant table\n");
 	printf("%s \t\t %s \t\t %s \t\t %s \t\t %s \n","ID","name","type","linecount","linenumbers");
