@@ -312,6 +312,15 @@ void printstring(struct string id)
                     }
                     printf("\n");
 }
+/*
+returns 1 if int;
+returns 2 if int arr
+returns 3 if char
+returns 4 if char arr
+returns 5 if void
+returns 6 if float
+returns 7 if float arr
+*/
 int checkdeclaration(struct string idinp,char identifier[])
 {
 	//printf("\n%s",identifier);
@@ -322,7 +331,6 @@ int checkdeclaration(struct string idinp,char identifier[])
 	if(ans.valid==0)
 	{
 	//	printf("not found");
-		
 		return 0;
 	}
 	int lengthofid=idinp.len;
@@ -333,43 +341,125 @@ int checkdeclaration(struct string idinp,char identifier[])
 			{
 			//	printf("found");
 				if(ans.proc_defn_flag==1)
-			{
-				return -1;
-			}
-				return 1;
+				{
+					return -1;
+				}
+				else if(strcmp(ans.type,"void")==0)
+				{
+					return 5;
+				}
+				else if(strcmp(ans.type,"float")==0)
+				{
+					if(strcmp(ans.arraydimention,"0")!=0)
+					{
+						return 7;
+					}
+					return 6;
+				}
+				else if(strcmp(ans.type,"char")==0)
+				{
+					if(strcmp(ans.arraydimention,"0")!=0)
+					{
+						return 4;
+					}
+					return 3;
+				}
+				else if(strcmp(ans.type,"int")==0)
+				{
+					if(strcmp(ans.arraydimention,"0")!=0)
+					{
+						return 2;
+					}
+					return 1;
+				}
+			
 			}
 			else{
-			struct symbol * pointer1= (struct symbol *) malloc( sizeof(struct symbol));
-			pointer1=&ans;
-			while(pointer1->next!=NULL)
-			{
-				//printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
+				struct symbol * pointer1= (struct symbol *) malloc( sizeof(struct symbol));
+				pointer1=&ans;
+				while(pointer1->next!=NULL)
+				{
+					//printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
+					if(strcmp(pointer1->scope,idinp.val)==0)				
+						{
+							if(pointer1->proc_defn_flag==1)
+							{
+								return -1;
+							}
+							else if(strcmp(pointer1->type,"void")==0)
+							{
+								return 5;
+							}
+							else if(strcmp(pointer1->type,"float")==0)
+							{
+								if(strcmp(pointer1->arraydimention,"0")!=0)
+								{
+									return 7;
+								}
+								return 6;
+							}
+							else if(strcmp(pointer1->type,"char")==0)
+							{
+								if(strcmp(pointer1->arraydimention,"0")!=0)
+								{
+									return 4;
+								}
+								return 3;
+							}
+							else if(strcmp(pointer1->type,"int")==0)
+							{
+							if(strcmp(pointer1->arraydimention,"0")!=0)
+								{
+									return 2;
+								}
+								return 1;
+							}	
+						}
+						pointer1=pointer1->next;
+				}
+			//	printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
 				if(strcmp(pointer1->scope,idinp.val)==0)				
-					{
-						if(ans.proc_defn_flag==1)
 						{
-							return -1;
+							if(pointer1->proc_defn_flag==1)
+								{
+									return -1;
+								}
+								else if(strcmp(pointer1->type,"void")==0)
+								{
+									return 5;
+								}
+								else if(strcmp(pointer1->type,"float")==0)
+								{
+									if(strcmp(pointer1->arraydimention,"0")!=0)
+									{
+										return 7;
+									}
+									return 6;
+								}
+								else if(strcmp(pointer1->type,"char")==0)
+								{
+									if(strcmp(pointer1->arraydimention,"0")!=0)
+									{
+										return 4;
+									}
+									return 3;
+								}
+								else if(strcmp(pointer1->type,"int")==0)
+								{
+									if(strcmp(pointer1->arraydimention,"0")!=0)
+									{
+										return 2;
+									}
+									return 1;
+								}	
 						}
-						return 1;
 						
-					}
-					pointer1=pointer1->next;
-			}
-		//	printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
-			if(strcmp(pointer1->scope,idinp.val)==0)				
-					{
-						if(ans.proc_defn_flag==1)
-						{
-							return -1;
-						}
-						return 1;
-						
-					}
-	}
-	lengthofid--;
+					
+				}
+			lengthofid--;
 			idinp.val[lengthofid]='\0';
 	}
-	//printf("notfound");
+
 			return 0;
 
 }
@@ -433,4 +523,14 @@ int checkdeclarationfunction(struct string idinp,char identifier[])
 //	printf("notfound");
 			return 0;
 
+}
+int min (int a,int b)
+{
+	if(a<b)
+	{
+		return a;
+	}
+	else{
+		return b;
+	}
 }

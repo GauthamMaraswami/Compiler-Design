@@ -38,6 +38,14 @@
 %type <sval>funDeclarationphase2
 %type <sval>funDeclarationphase3
 %type <sval>varDeclId
+%type <ival>mutable
+%type <ival>factor
+%type <ival>expression
+%type <ival>simpleExpression
+%type <ival>unaryRelExpression
+%type <ival>relExpression
+%type <ival>sumExpression
+%type <ival>term
 
 %{
 	#include<stdio.h>
@@ -80,7 +88,6 @@ declarationList:declaration declarationListhelper
 declarationListhelper:
 |declaration declarationListhelper
 ;
-
 
 
 
@@ -205,10 +212,15 @@ loopstmtlist:stmtlist expressionsemi
 |breakstmt
 ;
 breakstmt:breakval ';'
-selectionstmt:ifstmt '(' simpleExpression ')' statement
-|ifstmt '(' simpleExpression ')' statement ';'
-|ifstmt '(' simpleExpression ')' statement elsestmt  selectionhelper
 ;
+selectionstmt:ifstmt '(' selectionstmt1 ')' statement 
+|ifstmt '(' selectionstmt1 ')' statement ';' 
+|ifstmt '(' selectionstmt1')' statement elsestmt  selectionhelper 
+;
+
+selectionstmt1:simpleExpression {printf("rrtype of expression at line %d is %d \n",line-2,$1);}
+;
+
 selectionhelper: selectionstmt
 |statement
 ;
@@ -216,46 +228,47 @@ expressionsemi:expression ';'
 |mutable assop sumop NUM ';' 
 |mutable assop sumop ID ';'
 ;
-expression: mutable assop expression  { /*printf( " found assignment an:   %s\n" ,$2); */}
-|simpleExpression 
-|unary mutable 
-|mutable unary
+expression: mutable assop expression  { $$=$1; printf("type of expression at line %d is %d \n",line,$$);}
+|simpleExpression  {$$=$1;}
+|unary mutable {$$=$2;}
+|mutable unary {$$=$1;}
 ;
-simpleExpression: simpleExpression logicalopbin unaryRelExpression
-|unaryRelExpression 
-;
-
-unaryRelExpression: logicalnot unaryRelExpression
-|relExpression
-;
-relExpression:sumExpression relop sumExpression
-|sumExpression
+simpleExpression: simpleExpression logicalopbin unaryRelExpression {$$=1; }
+|unaryRelExpression {$$=$1;}
 ;
 
-sumExpression:sumExpression sumop term  {/*printf("add\n");*/}
-|term
+unaryRelExpression: logicalnot unaryRelExpression {$$=1;}
+|relExpression {$$=$1;}
+;
+relExpression:sumExpression relop sumExpression {$$=1;}
+|sumExpression {$$=$1;}
 ;
 
-term:term mulop factor	 {/*printf("multiply\n");*/}
-|factor
+sumExpression:sumExpression sumop term  {$$=min($1,$3);}
+|term {$$=$1;}
+;
+
+term:term mulop factor	 {$$=min($1,$3);}
+|factor {$$=$1;}
 ;
 
 iterationwhile:whilestmt'('simpleExpression')'loopstatement
 |whilestmt'('simpleExpression')' ';'
 ;
 
-factor:immutable
-|mutable		{/*printf("mutable\n");*/}
-|'('simpleExpression')'  {/*printf("brackets\n");*/}
-|callingnosq	 {/*printf("calling\n");*/}
+factor:immutable {$$=-9;}
+|mutable		{$$=$1;}
+|'('simpleExpression')'  {$$=$2;}
+|callingnosq	 {$$=-10;}
 ;
 
-mutable:mutable'['simpleExpression']'
-|mutable'['unary mutable']'
-|mutable'['mutable unary']'
+mutable:mutable'['simpleExpression']'{$$=$1;}
+|mutable'['unary mutable']' {$$=$1;}
+|mutable'['mutable unary']' {$$=$1;}
 |'&' ID { push_to_symbol_table($2,"data",id.val,line,0,"0",parameter_list,0);/* printf("%s  %s  \n",$2,id.val); */}
-|ID	{ int ans=checkdeclaration(id,$1); if(ans==0){printf("variable %s is not declared in this scope at line %d \n",$1,line);}
-else if(ans==-1){printf("identifier %s previously defined as procedure at line %d\n",$1,line);}}
+|ID	{ int ans=checkdeclaration(id,$1);/*printf("kkk%smmm%dlll%d\n,",$1,ans,line);*/ if(ans==0){printf("variable %s is not declared in this scope at line %d \n",$1,line);}
+else if(ans==-1){printf("identifier %s previously defined as procedure at line %d\n",$1,line);}
+else if(ans==5){printf("identifier %s declared as void at line %d\n",$1,line);} $$=ans;}
 ;
 
 
