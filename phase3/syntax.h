@@ -22,6 +22,7 @@ unsigned long hash(unsigned char *str)
 	struct identifier{
 		char name[100];
 		char type[100];
+		int arr_flag;
 	};
 	//symbol table
 	struct symbol{
@@ -32,6 +33,7 @@ unsigned long hash(unsigned char *str)
     char scope[100];
 	char arraydimention[10];
 	int proc_defn_flag;
+	char scopeoffunction[100];
 	int parameter_count;
 	struct identifier parameter_list[100];
 	int linecount;
@@ -53,30 +55,45 @@ unsigned long hash(unsigned char *str)
 	//no of constants
 
 	//function to add symbol to symbol table
-	void push_to_symbol_table(char ctemp[],char type[],char scope[],int l,int fun_def_flag,char arr_dim[],struct identifier parameter_list[],int parameter_count )
+	void push_to_symbol_table(char ctemp[],char type[],char scope[],int l,int fun_def_flag,char arr_dim[],struct identifier parameter_list[],int parameter_count,char scopeoffunction[] )
 	{
 		unsigned long map=hash(ctemp);
 		map=map%65535;
 		int len=strlen(ctemp);
 		if(symboltable[map].valid==1&&(strcmp(symboltable[map].name,ctemp)==0)) //case when the symbol is already in table first
 		{
+			
 			int found=0;
 			struct symbol * pointer= (struct symbol *) malloc( sizeof(struct symbol));
 			pointer=&symboltable[map];
+		//	printf("%s %s\n",pointer->scope,scope);
 			if(strcmp(symboltable[map].scope,scope)==0)
 			{
+				//printf("reaching bitch kapil\n");
 				found=1;
+				//printf("reaching bitch kapil %d\n",l);
 			}
+			
 			while(pointer->next!=NULL)
 			{
+				
 				if(strcmp(pointer->scope,scope)==0)				
 					{
 						found=1;
 					}
+				//	printf("%s %s\n",pointer->scope,scope);
+					pointer=pointer->next;
+					
 			}
+			if(strcmp(pointer->scope,scope)==0)				
+					{
+						found=1;
+					}
+				//	printf("%s %s\n",pointer->scope,scope);
+				
 			if(found==1)
 			{
-				printf("Identifier %s already exists in the scope at line %d\n",ctemp,l);
+			//	printf("Identifier %s already exists in the scope at line %d\n",ctemp,l);
 			}
 			else{
 				struct symbol * tempsymbol=(struct symbol *) malloc( sizeof(struct symbol));
@@ -87,6 +104,7 @@ unsigned long hash(unsigned char *str)
 				tempsymbol->next=NULL;
 				tempsymbol->lineno[tempsymbol->linecount]=l;
 				tempsymbol->linecount++;
+				strcpy(tempsymbol->scopeoffunction,scopeoffunction);
 				tempsymbol->proc_defn_flag=fun_def_flag;
 				tempsymbol->parameter_count=parameter_count;
 				if(parameter_count>0)
@@ -103,9 +121,9 @@ unsigned long hash(unsigned char *str)
 
 			symboltable[map].lineno[symboltable[map].linecount]=l;
 			symboltable[map].linecount++;
-
+			//	printf("eops\n");
 		}
-		else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)//case when symbol not in table first
+		/*else if(symboltable[map].valid==1&&strcmp(symboltable[map].name,ctemp)!=0)//case when symbol not in table first
 		{
 			int found=0;
 			struct symbol * pointer=&symboltable[map];
@@ -136,7 +154,7 @@ unsigned long hash(unsigned char *str)
 
 			}
 
-		}
+		}*/
 		else        //hashtable map is free
 		{										 
 			strncpy(symboltable[map].name,ctemp,len);
@@ -155,10 +173,12 @@ unsigned long hash(unsigned char *str)
 			}
 			strcpy(symboltable[map].arraydimention,arr_dim);
 			strcpy(symboltable[map].scope,scope);
+			strcpy(symboltable[map].scopeoffunction,scopeoffunction);
 			symboltable[map].lineno[symboltable[map].linecount]=l;
 			symboltable[map].linecount++;
 			++countsymbol;
 		}
+	
 	}
 	//function to add constants to constant table
 	void push_to_constants_table(char ctemp[],char type[],int l)  //case when the symbol is already in table first
@@ -308,9 +328,9 @@ void printstring(struct string id)
 {
                 for(int k=0;k<id.len;++k)
                     {
-                        printf("%c",id.val[k]);
+                        //printf("%c",id.val[k]);
                     }
-                    printf("\n");
+                    //printf("\n");
 }
 /*
 returns 1 if int;
@@ -323,7 +343,7 @@ returns 7 if float arr
 */
 int checkdeclaration(struct string idinp,char identifier[])
 {
-	//printf("\n%s",identifier);
+	//printf("\n%smf%s nf\n",identifier,idinp.val);
 	int len=strlen(identifier);
 	unsigned long  map=hash(identifier);
 	map=map%65535;
@@ -465,14 +485,14 @@ int checkdeclaration(struct string idinp,char identifier[])
 }
 int checkdeclarationfunction(struct string idinp,char identifier[])
 {
-	//printf("\n%s",identifier);
+	//printf("\n%s\n",identifier);
 	int len=strlen(identifier);
 	unsigned long  map=hash(identifier);
 	map=map%65535;
 	struct symbol ans= symboltable[map];
 	if(ans.valid==0)
 	{
-		//printf("not found");
+	//	printf("not found");
 		
 		return 0;
 	}
@@ -484,10 +504,37 @@ int checkdeclarationfunction(struct string idinp,char identifier[])
 			{
 			//	printf("found");
 				if(ans.proc_defn_flag==0)
-			{
-				return -1;
-			}
-				return 1;
+				{
+					return -1;
+				}
+				else if(strcmp(ans.type,"void")==0)
+						{
+							return 5;
+						}
+						else if(strcmp(ans.type,"float")==0)
+						{
+							if(strcmp(ans.arraydimention,"0")!=0)
+							{
+								return -3;
+							}
+							return 6;
+						}
+						else if(strcmp(ans.type,"char")==0)
+						{
+							if(strcmp(ans.arraydimention,"0")!=0)
+							{
+								return -3;
+							}
+							return 3;
+						}
+						else if(strcmp(ans.type,"int")==0)
+						{
+							if(strcmp(ans.arraydimention,"0")!=0)
+							{
+								return -3;
+							}
+							return 1;
+						}
 			}
 			else{
 			struct symbol * pointer1= (struct symbol *) malloc( sizeof(struct symbol));
@@ -497,11 +544,38 @@ int checkdeclarationfunction(struct string idinp,char identifier[])
 				//printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
 				if(strcmp(pointer1->scope,idinp.val)==0)				
 					{
-						if(ans.proc_defn_flag==0)
+						if(pointer1->proc_defn_flag==0)
 						{
 							return -1;
 						}
-						return 1;
+						else if(strcmp(pointer1->type,"void")==0)
+						{
+							return 5;
+						}
+						else if(strcmp(pointer1->type,"float")==0)
+						{
+							if(strcmp(pointer1->arraydimention,"0")!=0)
+							{
+								return -3;
+							}
+							return 6;
+						}
+						else if(strcmp(pointer1->type,"char")==0)
+						{
+							if(strcmp(pointer1->arraydimention,"0")!=0)
+							{
+								return -3;
+							}
+							return 3;
+						}
+						else if(strcmp(pointer1->type,"int")==0)
+						{
+							if(strcmp(pointer1->arraydimention,"0")!=0)
+							{
+								return -3;
+							}
+							return 1;
+						}
 						
 					}
 					pointer1=pointer1->next;
@@ -509,11 +583,39 @@ int checkdeclarationfunction(struct string idinp,char identifier[])
 			//printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
 			if(strcmp(pointer1->scope,idinp.val)==0)				
 					{
-						if(ans.proc_defn_flag==0)
+						if(pointer1->proc_defn_flag==0)
 						{
 							return -1;
 						}
-						return 1;
+						else if(strcmp(pointer1->type,"void")==0)
+						{
+							return 5;
+						}
+						else if(strcmp(pointer1->type,"float")==0)
+						{
+							if(strcmp(pointer1->arraydimention,"0")!=0)
+							{
+								return -3;
+							}
+							return 6;
+						}
+						else if(strcmp(pointer1->type,"char")==0)
+						{
+							if(strcmp(pointer1->arraydimention,"0")!=0)
+							{
+								return -3;
+							}
+							return 3;
+						}
+						else if(strcmp(pointer1->type,"int")==0)
+						{
+							if(strcmp(pointer1->arraydimention,"0")!=0)
+							{
+								return -3;
+							}
+							return 1;
+						}		
+						
 						
 					}
 	}
@@ -524,6 +626,176 @@ int checkdeclarationfunction(struct string idinp,char identifier[])
 			return 0;
 
 }
+int getnoofparametes(struct string idinp,char identifier[])
+{
+	//printf("\n%s\n",identifier);
+	int len=strlen(identifier);
+	unsigned long  map=hash(identifier);
+	map=map%65535;
+	struct symbol ans= symboltable[map];
+	if(ans.valid==0)
+	{
+	//	printf("not found");
+		
+		return 0;
+	}
+	int lengthofid=idinp.len;
+	while(lengthofid>=0)
+	{
+		//printf("+++%s---%s+++\n",idinp.val,ans.scope);
+			if(strcmp(ans.scope,idinp.val)==0)
+			{
+			return ans.parameter_count;
+			}
+			else{
+			struct symbol * pointer1= (struct symbol *) malloc( sizeof(struct symbol));
+			pointer1=&ans;
+			while(pointer1->next!=NULL)
+			{
+				//printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
+				if(strcmp(pointer1->scope,idinp.val)==0)				
+					{
+						return pointer1->parameter_count;
+						
+					}
+					pointer1=pointer1->next;
+			}
+			//printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
+			if(strcmp(pointer1->scope,idinp.val)==0)				
+					{
+						return pointer1->parameter_count;
+						
+					}
+	}
+	lengthofid--;
+			idinp.val[lengthofid]='\0';
+	}
+//	printf("notfound");
+			return 0;
+
+}
+int match_params(int arglist[],int argument_count,struct string idinp,char identifier[])
+{
+	struct string curr_scope=idinp;
+for(int ix=0;ix<argument_count;++ix)
+{
+	//printf("%d",arglist[ix]);
+}
+//printf("done\n");
+	//printf("\n%s\n",identifier);
+	int len=strlen(identifier);
+	unsigned long  map=hash(identifier);
+	map=map%65535;
+	struct symbol ans= symboltable[map];
+	if(ans.valid==0)
+	{
+	//	printf("not found");
+		
+		return 0;
+	}
+	int lengthofid=idinp.len;
+	while(lengthofid>=0)
+	{
+		//printf("+++%s---%s+++\n",idinp.val,ans.scope);
+			if(strcmp(ans.scope,idinp.val)==0)
+			{
+		
+			int arg_count=0;
+			for(int te=ans.parameter_count-1;te>=0;--te)
+			{
+				struct string scopeoffunction;
+				strcpy(scopeoffunction.val,ans.scopeoffunction);
+				scopeoffunction.len=strlen(ans.scopeoffunction);
+				int answ=checkdeclaration(scopeoffunction,ans.parameter_list[te].name);
+				//printf("%d%d",answ,arglist[arg_count]);
+					if(answ==2||answ==4||answ==7)
+							{
+								if(arglist[arg_count]==0)
+									return 0;
+							}
+							else 
+								{
+									if(arglist[arg_count]==1)
+									return 0;
+								}
+				arg_count++;
+				
+			}
+			return 1;
+			}
+			else{
+			struct symbol * pointer1= (struct symbol *) malloc( sizeof(struct symbol));
+			pointer1=&ans;
+			while(pointer1->next!=NULL)
+			{
+				//printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
+				if(strcmp(pointer1->scope,idinp.val)==0)				
+					{
+						int arg_count=0;
+					
+						for(int te=pointer1->parameter_count-1;te>=0;--te)
+						{
+							struct string scopeoffunction;
+				strcpy(scopeoffunction.val,pointer1->scopeoffunction);
+				scopeoffunction.len=strlen(pointer1->scopeoffunction);
+				int answ=checkdeclaration(scopeoffunction,pointer1->parameter_list[te].name);
+								//printf("%d%d",answ,arglist[arg_count]);
+								if(answ==2||answ==4||answ==7)
+							{
+								if(arglist[arg_count]==0)
+									return 0;
+							}
+							else 
+								{
+									if(arglist[arg_count]==1)
+									return 0;
+								}
+								arg_count++;
+						}
+						return 1;
+						
+					}
+					pointer1=pointer1->next;
+			}
+			//printf("+++%s---%s+++\n",idinp.val,pointer1->scope);
+			if(strcmp(pointer1->scope,idinp.val)==0)				
+					{
+						int arg_count=0;
+						
+						for(int te=pointer1->parameter_count-1;te>=0;--te)
+						{
+							struct string scopeoffunction;
+				strcpy(scopeoffunction.val,pointer1->scopeoffunction);
+				scopeoffunction.len=strlen(pointer1->scopeoffunction);
+				int answ=checkdeclaration(scopeoffunction,pointer1->parameter_list[te].name);
+						//	printf("%d%d",answ,arglist[arg_count]);
+							if(answ==2||answ==4||answ==7)
+							{
+								if(arglist[arg_count]==0)
+									return 0;
+							}
+							else 
+								{
+									if(arglist[arg_count]==1)
+									return 0;
+								}
+								arg_count++;
+						}
+						return 1;
+						
+					}
+			}
+	lengthofid--;
+			idinp.val[lengthofid]='\0';
+	}
+//	printf("notfound");
+			return 0;
+
+}
+
+
+
+
 int min (int a,int b)
 {
 	if(a<b)

@@ -46,7 +46,11 @@
 %type <ival>relExpression
 %type <ival>sumExpression
 %type <ival>term
-
+%type <ival>mutablearr
+%type <ival>expressionhelper
+%type<ival>args
+%type<ival>arglist
+%type<ival>immutable
 %{
 	#include<stdio.h>
 	#include<string.h>
@@ -66,6 +70,8 @@
 	int parameter_count=0;
 	struct identifier parameter_list[100];
 	char funname_global[100];
+	int argument_list[100];
+	int argument_count=0;
 
 %}
 %%
@@ -113,31 +119,37 @@ varDeclarationStmt:
 
 varDeclInitialize:varDeclId
 ;
-varDeclId:ID { strcpy($$,$1);push_to_symbol_table($1,test,id.val,line,0,"0",parameter_list,0); /*printf("%s  %s  \n",$1,id.val);*/}
+varDeclId:ID { strcpy($$,$1);push_to_symbol_table($1,test,id.val,line,0,"0",parameter_list,0,"-1"); /*printf("%s  %s  \n",$1,id.val);*/}
 |ID '[' sumop NUM ']' {  strcpy($$,$1);
 							if(strcmp($3,"-")==0)
 							{
 								printf("array size cannot be negative at line %d \n",line);
 							}
 							else{					
-	push_to_symbol_table($1,test,id.val,line,0,$4,parameter_list,0);push_to_constants_table($4,"number",line); }
+	push_to_symbol_table($1,test,id.val,line,0,$4,parameter_list,0,"-1");push_to_constants_table($4,"number",line); }
 						}
-|ID '[' NUM ']'{strcpy($$,$1); push_to_symbol_table($1,test,id.val,line,0,$3,parameter_list,0);push_to_constants_table($3,"number",line); }
+|ID '[' NUM ']'{strcpy($$,$1); push_to_symbol_table($1,test,id.val,line,0,$3,parameter_list,0,"-1");push_to_constants_table($3,"number",line); }
 						
 ;
 typeSpecifier:dtype  {strcpy($$,$1);strcpy(test,$1); }
 ;
 
-funDeclaration: funDeclarationphase1 statement { push_to_symbol_table(funname_global,test,id.val,line,1,"0",parameter_list,parameter_count);
-	parameter_count=0;
+funDeclaration: funDeclarationphase1 statement { //failhandler
 	if(strcmp($1,"void")==0&&return_not_void_flag==1){printf("return type mismatch error at line %d \n" ,line);} else if(strcmp($1,"void")!=0&&return_not_void_flag==0){printf("return type mismatch error at line %d \n" ,line);} return_not_void_flag=0;}
 ;
 
-funDeclarationphase1: funDeclarationphase2 ')' { brac_act_flag=1;strcpy($$,$1); }
+funDeclarationphase1: funDeclarationphase2 ')' { brac_act_flag=1;strcpy($$,$1);
+	//this part of the code may not work if it fails copy l+5 and l+6 to failhandler
+	struct string tempid;
+	tempid=id;
+	id.val[id.len-1]='\0';
+	push_to_symbol_table(funname_global,$1,id.val,line,1,"0",parameter_list,parameter_count,tempid.val);
+	parameter_count=0;
+	id=tempid; }
 ;
 funDeclarationphase2: funDeclarationphase3 params {strcpy($$,$1);}
 ;
-funDeclarationphase3: typeSpecifier ID '('  { strcpy(funname_global,$2);  id=openbraceencounter(id);  strcpy($$,$1);}
+funDeclarationphase3: typeSpecifier ID '('  { strcpy(funname_global,$2); id=openbraceencounter(id); strcpy($$,$1);}
 ;
 funName:ID {  }
 ;
@@ -195,7 +207,7 @@ stmtlist:stmtlist expressionsemi
 
 
 returnstmt: returnval ';' {return_not_void_flag=1;}
-|returnval simpleExpression ';' {return_not_void_flag=1;}
+|returnval simpleExpression ';' {return_not_void_flag=1; if($2==2||$2==4||$2==7){printf("return type cannot be array at %d\n",line);}}
 ;
 loopstmtlist:stmtlist expressionsemi
 |stmtlist varDeclaration
@@ -218,7 +230,7 @@ selectionstmt:ifstmt '(' selectionstmt1 ')' statement
 |ifstmt '(' selectionstmt1')' statement elsestmt  selectionhelper 
 ;
 
-selectionstmt1:simpleExpression {printf("rrtype of expression at line %d is %d \n",line-2,$1);}
+selectionstmt1:simpleExpression {if($1!=1){printf("expression in test  is not of type int at line %d\n",line-3);}}
 ;
 
 selectionhelper: selectionstmt
@@ -228,8 +240,10 @@ expressionsemi:expression ';'
 |mutable assop sumop NUM ';' 
 |mutable assop sumop ID ';'
 ;
-expression: mutable assop expression  { $$=$1; printf("type of expression at line %d is %d \n",line,$$);}
-|simpleExpression  {$$=$1;}
+expression: mutable assop expressionhelper  { $$=$1;}
+|expressionhelper
+;
+expressionhelper:simpleExpression  {$$=$1;}
 |unary mutable {$$=$2;}
 |mutable unary {$$=$1;}
 ;
@@ -252,43 +266,96 @@ term:term mulop factor	 {$$=min($1,$3);}
 |factor {$$=$1;}
 ;
 
-iterationwhile:whilestmt'('simpleExpression')'loopstatement
-|whilestmt'('simpleExpression')' ';'
+iterationwhile:whilestmt'('selectionstmt1')'loopstatement 
+|whilestmt'('selectionstmt1')' ';' 
 ;
 
-factor:immutable {$$=-9;}
+
+
+factor:immutable {$$=$1;}
 |mutable		{$$=$1;}
 |'('simpleExpression')'  {$$=$2;}
 |callingnosq	 {$$=-10;}
 ;
 
-mutable:mutable'['simpleExpression']'{$$=$1;}
-|mutable'['unary mutable']' {$$=$1;}
-|mutable'['mutable unary']' {$$=$1;}
-|'&' ID { push_to_symbol_table($2,"data",id.val,line,0,"0",parameter_list,0);/* printf("%s  %s  \n",$2,id.val); */}
-|ID	{ int ans=checkdeclaration(id,$1);/*printf("kkk%smmm%dlll%d\n,",$1,ans,line);*/ if(ans==0){printf("variable %s is not declared in this scope at line %d \n",$1,line);}
+mutable:mutablearr
+|'&' ID { push_to_symbol_table($2,"data",id.val,line,0,"0",parameter_list,0,"-1");
+/* printf("%s  %s  \n",$2,id.val); */}
+|ID	{ int ans=checkdeclaration(id,$1);
+/*printf("kkk%smmm%dlll%d\n,",$1,ans,line);*/
+ if(ans==0){printf("variable %s is not declared in this scope at line %d \n",$1,line);}
 else if(ans==-1){printf("identifier %s previously defined as procedure at line %d\n",$1,line);}
-else if(ans==5){printf("identifier %s declared as void at line %d\n",$1,line);} $$=ans;}
+else if(ans==5){printf("identifier %s declared as void at line %d\n",$1,line);}
+else if(ans==2||ans==4||ans==7){printf("identifier %s is of type array line %d\n",$1,line);}
+ $$=ans;}
 ;
 
 
-immutable:NUM	{ push_to_constants_table($1,"number",line);}
-|charcnst	{ push_to_constants_table($1,"character",line);}
-|stringcnst	{ push_to_constants_table($1,"string",line);}
-|floatcnst	{ push_to_constants_table($1,"float",line);}
-|badcharcnst	{ push_to_constants_table($1,"character",line);}
+
+
+mutablearr :mutablearr '[' simpleExpression ']'{$$=$1; if($3!=1)
+ {printf("Expression in subscript not of type int at line %d\n",line);} 
+ if($1!=2&&$1!=4&&$1!=7) {printf("variable  is  at line is not declared as array %d\n",line);}}
+|mutablearr  '['unary mutable']' {$$=$1; 
+if($4!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
+if($1!=2&&$1!=4&&$1!=7) {printf("variable is  at line is not declared as array %d\n",line);}
+}
+|mutablearr  '['mutable unary']' {$$=$1;
+if($3!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
+if($1!=2&&$1!=4&&$1!=7) {printf("variable is  at line is not declared as array %d\n",line);}
+}
+|ID '[' simpleExpression ']'{int ans=checkdeclaration(id,$1); $$=ans;
+ if($3!=1)
+ {printf("Expression in subscript not of type int at line %d\n",line);} 
+ if(ans!=2&&ans!=4&&ans!=7) {printf("variable is  at line is not declared as array %d\n",line);}}
+|ID '['unary mutable']' {int ans=checkdeclaration(id,$1); $$=ans;
+if($4!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
+if(ans!=2&&ans!=4&&ans!=7) {printf("variable is  at line is not declared as array %d\n",line);}
+}
+|ID '['mutable unary']' {  int ans=checkdeclaration(id,$1); $$=ans;
+if($3!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
+if(ans!=2&&ans!=4&&ans!=7) {printf("variable is  at line is not declared as array %d\n",line);}
+}
 ;
 
 
-callingnosq:funName'('args')' {int ans=checkdeclarationfunction(id,$1); if(ans==0){printf("function %s is not declared in this scope at line %d \n",$1,line);}
-else if(ans==-1){printf("identifier %s not declared as procedure at line %d\n",$1,line);};
+immutable:NUM	{ push_to_constants_table($1,"number",line); $$=1;}
+|charcnst	{ push_to_constants_table($1,"character",line);$$=3;}
+|stringcnst	{ push_to_constants_table($1,"string",line);$$=4;}
+|floatcnst	{ push_to_constants_table($1,"float",line);$$=6;}
+|badcharcnst	{ push_to_constants_table($1,"character",line);$$=-1;}
+;
+
+
+callingnosq:funName'('args')' {int ans=checkdeclarationfunction(id,$1); 
+if(ans==0){printf("function %s is not declared in this scope at line %d \n",$1,line);}
+else if(ans==-1){printf("identifier %s not declared as procedure at line %d\n",$1,line);}
+else if(ans==-3){printf("return type of function %s is of type array at line %d\n",$1,line);}
+else {int noparam=getnoofparametes(id,$1); 
+if(noparam!=$3){printf("no of parameters does not match for function %s\n",$1);}
+else {
+int matched=match_params(argument_list,argument_count,id,$1);
+if (matched==0)
+{
+	printf("argument types does not match\n");
+}
+
+}
+
+}
+argument_count=0;
 }	
 ;
-args:
-|arglist
+args:    {$$=0;}
+|arglist {$$=$1;}
 ;
-arglist:arglist','expression
-|expression
+arglist:arglist','expression {$$=$1+1; if($3==2||$3==4||$3==7){argument_list[argument_count]=1;}
+else {argument_list[argument_count]=0;}
+++argument_count;}
+|expression {$$=1; if($1==2||$1==4||$1==7){argument_list[argument_count]=1;}
+else {argument_list[argument_count]=0;}
+++argument_count;
+}
 ;
 
 structoruniondefn: structspecifier ID '{' varDeclarationStmt '}' ';'
@@ -298,7 +365,7 @@ structspecifier:structs  {strcpy($$,$1); strcpy(test,$1);}
 |unions	 {strcpy($$,$1);}
 ;
 
-switch:switchval '(' expression ')''{' switchstatement '}'
+switch:switchval '(' selectionstmt1 ')''{' switchstatement '}' { }
 ;
 switchstatement:
 | casestmt  switchimmutable ':' loopstmtlist switchstatement
@@ -306,10 +373,11 @@ switchstatement:
 |defaultstmt ':' loopstmtlist
 |defaultstmt ':''{'loopstmtlist'}'
 ;
+
 switchimmutable:NUM {push_to_constants_table($1,"number",line);}
 |charcnst { push_to_constants_table($1,"number",line);}
-|sumop NUM
-|sumop ID
+|sumop NUM { push_to_constants_table($2,"number",line);}
+|sumop ID { push_to_constants_table($3,"number",line);}
 |ID
 ;	
 
