@@ -377,7 +377,7 @@ switchstatement:
 switchimmutable:NUM {push_to_constants_table($1,"number",line);}
 |charcnst { push_to_constants_table($1,"number",line);}
 |sumop NUM { push_to_constants_table($2,"number",line);}
-|sumop ID { push_to_constants_table($3,"number",line);}
+|sumop ID { push_to_constants_table($2,"number",line);}
 |ID
 ;	
 
