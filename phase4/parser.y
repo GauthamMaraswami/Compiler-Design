@@ -42,8 +42,8 @@
 %type <sval>funDeclarationphase2
 %type <sval>funDeclarationphase3
 %type <sval>varDeclId
-%type <ival>mutable
-%type <ival>factor
+%type <expressionvar>mutable
+%type <expressionvar>factor
 %type <expressionvar>expression
 %type <expressionvar>simpleExpression
 %type <expressionvar>unaryRelExpression
@@ -54,7 +54,7 @@
 %type <expressionvar>expressionhelper
 %type<ival>args
 %type<ival>arglist
-%type<ival>immutable
+%type<expressionvar>immutable
 %{
 	#include<stdio.h>
 	#include<string.h>
@@ -76,18 +76,18 @@
 	char funname_global[100];
 	int argument_list[100];
 	int argument_count=0;
-
+	int elseifflag=0;
 %}
 %%
 
 ED:program
 {
-	printf("Valid Expressions : ");
+	printf("Valid Expressions : \n");
 }
 ;
 program:expressionsemi
 |declarationList
-|selectionstmt
+|selectionstmt {elseifflag=0;}
 |structoruniondefn
 |structoruniondefn program
 ;
@@ -173,8 +173,8 @@ paramList: typeSpecifier varDeclId ','paramList  {
 	if(strcmp($1,"void")==0){printf("parameter cannot be void at line %d",line);}}
 ;
  
-statement:  statement1 '}' {/*printf("close");*/id=closebraceencounter(id);}
-| statement2 '}' {/*printf("close");*/id=closebraceencounter(id);}
+statement:  statement1 '}' {/*printf("close");*/id=closebraceencounter(id); update_goto_stmt(0);}
+| statement2 '}' {/*printf("close");*/id=closebraceencounter(id);update_goto_stmt(0);}
 ;
 statement1: statement2 stmtlist 
 ;
@@ -200,13 +200,14 @@ stmtlist:stmtlist expressionsemi
 |stmtlist varDeclaration
 |expressionsemi 
 |varDeclaration 
-|stmtlist selectionstmt
+|stmtlist selectionstmt {elseifflag=0;}
 |stmtlist iterationwhile
 |stmtlist returnstmt 
 |stmtlist switch 
 |switch 
+|iterationwhile
 |returnstmt 
-|selectionstmt
+|selectionstmt {elseifflag=0;}
 ;
 
 
@@ -217,72 +218,90 @@ loopstmtlist:stmtlist expressionsemi
 |stmtlist varDeclaration
 |expressionsemi
 |varDeclaration
-|stmtlist selectionstmt
+|stmtlist selectionstmt {elseifflag=0;}
 |stmtlist iterationwhile
 |stmtlist returnstmt
 |stmtlist switch
 |stmtlist breakstmt
 |switch
 |returnstmt
-|selectionstmt
+|selectionstmt {elseifflag=0;}
 |breakstmt
 ;
 breakstmt:breakval ';'
 ;
 selectionstmt:ifstmt '(' selectionstmt1 ')' statement 
 |ifstmt '(' selectionstmt1 ')' statement ';' 
-|ifstmt '(' selectionstmt1')' statement elsestmt  selectionhelper 
+|ifstmt '(' selectionstmt1')' statement elsetoputflag selectionhelper 
+;
+elsetoputflag:elsestmt {elseifflag=1;}
+;
+selectionstmt1:simpleExpression {if($1.type!=1){printf("expression in test  is not of type int at line %d\n",line-3);}
+CreateDocument($1.val,"","","",1,0);
+CreateDocument("","","","",0,1);
+if(elseifflag==1)
+{
+	printf("this is else if stmt\n");
+}
+	}
 ;
 
-selectionstmt1:simpleExpression {if($1.type!=1){printf("expression in test  is not of type int at line %d\n",line-3);}}
-;
-
-selectionhelper: selectionstmt
-|statement
+selectionhelper: selectionstmt 
+|statement  
 ;
 expressionsemi:expression ';'
 |mutable assop sumop NUM ';' 
 |mutable assop sumop ID ';'
 ;
-expression: mutable assop expressionhelper  { $$.type=$3.type;}
-|expressionhelper
+expression: mutable assop expressionhelper  { $$.type=$3.type;CreateDocument($1.val,"","",$3.val,0,0); }
+|expressionhelper  {$$.type=$1.type;strcpy($$.val,$1.val);}
 ;
-expressionhelper:simpleExpression  {$$.type=$1.type;}
-|unary mutable {$$.type=$2;}
-|mutable unary {$$.type=$1;}
+expressionhelper:simpleExpression  {$$.type=$1.type;strcpy($$.val,$1.val);}
+|unary mutable {$$.type=$2.type;char c[10];CreateTempvar(c);if(strcmp($1,"++")==0){CreateDocument(c,$2.val,"+","1",0,0);}
+else{
+CreateDocument(c,$2.val,"-","1",0,0);	
+}
+CreateDocument($2.val,"","",c,0,0); 
+strcpy($$.val,c);}
+|mutable unary {$$.type=$1.type;char c[10];CreateTempvar(c);if(strcmp($2,"++")==0){CreateDocument(c,$1.val,"+","1",0,0);}
+else{
+CreateDocument(c,$1.val,"-","1",0,0);	
+}
+CreateDocument($1.val,"","",c,0,0); 
+strcpy($$.val,$1.val);}
 ;
-simpleExpression: simpleExpression logicalopbin unaryRelExpression {$$.type=1; }
-|unaryRelExpression {$$.type=$1.type;}
-;
-
-unaryRelExpression: logicalnot unaryRelExpression {$$.type=1;}
-|relExpression {$$.type=$1.type;}
-;
-relExpression:sumExpression relop sumExpression {$$.type=1;}
-|sumExpression {$$.type=$1.type;}
-;
-
-sumExpression:sumExpression sumop term  {$$.type=min($1.type,$3.type);}
-|term {$$.type=$1.type;}
-;
-
-term:term mulop factor	 {$$.type=min($1.type,$3);}
-|factor {$$.type=$1;}
+simpleExpression: simpleExpression logicalopbin unaryRelExpression {$$.type=1; char c[10];CreateTempvar(c);CreateDocument(c,$1.val,$2,$3.val,0,0);strcpy($$.val,c);}
+|unaryRelExpression {$$.type=$1.type;strcpy($$.val,$1.val);}
 ;
 
-iterationwhile:whilestmt'('selectionstmt1')'loopstatement 
-|whilestmt'('selectionstmt1')' ';' 
+unaryRelExpression: logicalnot unaryRelExpression {$$.type=1;char c[10];CreateTempvar(c);CreateDocument(c,"","not",$2.val,0,0);strcpy($$.val,c);}
+|relExpression {$$.type=$1.type;strcpy($$.val,$1.val);}
+;
+relExpression:sumExpression relop sumExpression {$$.type=1;char c[10];CreateTempvar(c);CreateDocument(c,$1.val,$2,$3.val,0,0);strcpy($$.val,c);}
+|sumExpression {$$.type=$1.type; strcpy($$.val,$1.val);}
+;
+
+sumExpression:sumExpression sumop term  {$$.type=min($1.type,$3.type); char c[10];CreateTempvar(c);CreateDocument(c,$1.val,$2,$3.val,0,0);strcpy($$.val,c);}
+|term {$$.type=$1.type; strcpy($$.val,$1.val);}
+;
+
+term:term mulop factor	 {$$.type=min($1.type,$3.type); char c[10];CreateTempvar(c);CreateDocument(c,$1.val,$2,$3.val,0,0);strcpy($$.val,c);}
+|factor {$$.type=$1.type;  strcpy($$.val,$1.val);}
+;
+
+iterationwhile:whilestmt'('selectionstmt1')'loopstatement {update_goto_stmt(1);}
+|whilestmt'('selectionstmt1')' ';' {update_goto_stmt(1);}
 ;
 
 
 
-factor:immutable {$$=$1;}
-|mutable		{$$=$1;}
-|'('simpleExpression')'  {$$=$2.type;}
-|callingnosq	 {$$=-10;}
+factor:immutable {$$.type=$1.type; strcpy($$.val,$1.val);}
+|mutable		{$$.type=$1.type;  strcpy($$.val,$1.val);}
+|'('expressionhelper')'  {$$.type=$2.type; strcpy($$.val,$2.val);}
+|callingnosq	 {$$.type=-10;}
 ;
 
-mutable:mutablearr
+mutable:mutablearr {}
 |'&' ID { push_to_symbol_table($2,"data",id.val,line,0,"0",parameter_list,0,"-1");
 /* printf("%s  %s  \n",$2,id.val); */}
 |ID	{ int ans=checkdeclaration(id,$1);
@@ -291,7 +310,8 @@ mutable:mutablearr
 else if(ans==-1){printf("identifier %s previously defined as procedure at line %d\n",$1,line);}
 else if(ans==5){printf("identifier %s declared as void at line %d\n",$1,line);}
 else if(ans==2||ans==4||ans==7){printf("identifier %s is of type array line %d\n",$1,line);}
- $$=ans;}
+ $$.type=ans;
+ strcpy($$.val,$1);}
 ;
 
 
@@ -301,11 +321,11 @@ mutablearr :mutablearr '[' simpleExpression ']'{$$=$1; if($3.type!=1)
  {printf("Expression in subscript not of type int at line %d\n",line);} 
  if($1!=2&&$1!=4&&$1!=7) {printf("variable  is  at line is not declared as array %d\n",line);}}
 |mutablearr  '['unary mutable']' {$$=$1; 
-if($4!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
+if($4.type!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
 if($1!=2&&$1!=4&&$1!=7) {printf("variable is  at line is not declared as array %d\n",line);}
 }
 |mutablearr  '['mutable unary']' {$$=$1;
-if($3!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
+if($3.type!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
 if($1!=2&&$1!=4&&$1!=7) {printf("variable is  at line is not declared as array %d\n",line);}
 }
 |ID '[' simpleExpression ']'{int ans=checkdeclaration(id,$1); $$=ans;
@@ -313,21 +333,21 @@ if($1!=2&&$1!=4&&$1!=7) {printf("variable is  at line is not declared as array %
  {printf("Expression in subscript not of type int at line %d\n",line);} 
  if(ans!=2&&ans!=4&&ans!=7) {printf("variable is  at line is not declared as array %d\n",line);}}
 |ID '['unary mutable']' {int ans=checkdeclaration(id,$1); $$=ans;
-if($4!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
+if($4.type!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
 if(ans!=2&&ans!=4&&ans!=7) {printf("variable is  at line is not declared as array %d\n",line);}
 }
 |ID '['mutable unary']' {  int ans=checkdeclaration(id,$1); $$=ans;
-if($3!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
+if($3.type!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
 if(ans!=2&&ans!=4&&ans!=7) {printf("variable is  at line is not declared as array %d\n",line);}
 }
 ;
 
 
-immutable:NUM	{ push_to_constants_table($1,"number",line); $$=1;}
-|charcnst	{ push_to_constants_table($1,"character",line);$$=3;}
-|stringcnst	{ push_to_constants_table($1,"string",line);$$=4;}
-|floatcnst	{ push_to_constants_table($1,"float",line);$$=6;}
-|badcharcnst	{ push_to_constants_table($1,"character",line);$$=-1;}
+immutable:NUM	{ push_to_constants_table($1,"number",line); $$.type=1; strcpy($$.val,$1);}
+|charcnst	{ push_to_constants_table($1,"character",line);$$.type=3; strcpy($$.val,$1);}
+|stringcnst	{ push_to_constants_table($1,"string",line);$$.type=4; strcpy($$.val,$1);}
+|floatcnst	{ push_to_constants_table($1,"float",line);$$.type=6; strcpy($$.val,$1);}
+|badcharcnst	{ push_to_constants_table($1,"character",line);$$.type=-1; strcpy($$.val,$1);}
 ;
 
 
@@ -403,9 +423,9 @@ int main()
 	id.len=1;
 	id.val[id.len]='\0';
 
-	yyin=fopen("Testcases/tester_4.c","r");
+	yyin=fopen("tester.c","r");
 	yyparse();
-
+	printthreeaddresscode();
 	printf("\n\t\t\t\t\tsymbols table\n");
 	printf("%s \t %s \t %s \t %s \t %s  %s \t %s \t %s   %s\n","ID","name","type","scope","linecount","fun_def_flag","array_dim","paramcount","parameters");
 	for(i=0;i<65535;++i)
