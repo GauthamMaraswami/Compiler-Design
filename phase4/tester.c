@@ -31,3 +31,4 @@ int main(int aa[100],float ans1)
     ans%=1000;
     return 0;
 }
+

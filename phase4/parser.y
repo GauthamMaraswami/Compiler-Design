@@ -102,7 +102,7 @@ declarationListhelper:
 
 
 declaration: varDeclaration  
-|funDeclaration
+|funDeclaration {CreateDocument("return","","","",0,0);}
 ;
 varDeclaration: typeSpecifier varDeclList ';'  
 |structspecifier ID varDeclList ';' 
@@ -153,7 +153,7 @@ funDeclarationphase1: funDeclarationphase2 ')' { brac_act_flag=1;strcpy($$,$1);
 ;
 funDeclarationphase2: funDeclarationphase3 params {strcpy($$,$1);}
 ;
-funDeclarationphase3: typeSpecifier ID '('  { strcpy(funname_global,$2); id=openbraceencounter(id); strcpy($$,$1);}
+funDeclarationphase3: typeSpecifier ID '('  { strcpy(funname_global,$2); id=openbraceencounter(id); strcpy($$,$1);CreateDocument("goto 1","","","",0,0);}
 ;
 funName:ID {  }
 ;
@@ -449,10 +449,10 @@ int main()
 	id.len=1;
 	id.val[id.len]='\0';
 
-	yyin=fopen("tester.c","r");
-	CreateDocument("goto 1","","","",0,0);
+	yyin=fopen("Testcases/testcase6.c","r");
+	
 	yyparse();
-	CreateDocument("return","","","",0,0);
+	
 	printthreeaddresscode();
 	printf("\n\t\t\t\t\tsymbols table\n");
 	printf("%s \t %s \t %s \t %s \t %s  %s \t %s \t %s   %s\n","ID","name","type","scope","linecount","fun_def_flag","array_dim","paramcount","parameters");
