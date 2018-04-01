@@ -2293,7 +2293,9 @@ int main()
 	id.val[id.len]='\0';
 
 	yyin=fopen("tester.c","r");
+	CreateDocument("goto 1","","","",0,0);
 	yyparse();
+	CreateDocument("return","","","",0,0);
 	printthreeaddresscode();
 	printf("\n\t\t\t\t\tsymbols table\n");
 	printf("%s \t %s \t %s \t %s \t %s  %s \t %s \t %s   %s\n","ID","name","type","scope","linecount","fun_def_flag","array_dim","paramcount","parameters");
