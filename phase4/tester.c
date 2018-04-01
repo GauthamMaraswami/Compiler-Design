@@ -9,14 +9,24 @@ int main(int aa[100],float ans1)
         if(ans>15)
         {
             ans=10*ans;
+            if(ans<10){
+            ans=0;
+            }
+            else
+            {
+                ans=1;
+            }
         }
         else if(ans<21)
         {
             ans=100;
         }
         else{
-       ans--;
+            ans=0;
         }
+        ans--;
+       
+      
     }
     return 0;
 }

@@ -87,7 +87,7 @@ ED:program
 ;
 program:expressionsemi
 |declarationList
-|selectionstmt {elseifflag=0;}
+|selectionstmt {elseifflag=0;fixgoto();}
 |structoruniondefn
 |structoruniondefn program
 ;
@@ -173,8 +173,19 @@ paramList: typeSpecifier varDeclId ','paramList  {
 	if(strcmp($1,"void")==0){printf("parameter cannot be void at line %d",line);}}
 ;
  
-statement:  statement1 '}' {/*printf("close");*/id=closebraceencounter(id); update_goto_stmt(0);}
-| statement2 '}' {/*printf("close");*/id=closebraceencounter(id);update_goto_stmt(0);}
+statement:  statement1 '}' {/*printf("close");*/id=closebraceencounter(id); if(elseifflag==0)
+{update_goto_stmt(2);}
+else if(elseifflag==2)
+{}
+else
+{update_goto_stmt(0);}}
+
+| statement2 '}' {/*printf("close");*/id=closebraceencounter(id);if(elseifflag==0)
+{update_goto_stmt(2);}
+else if(elseifflag==2)
+{}
+else
+{update_goto_stmt(0);}}
 ;
 statement1: statement2 stmtlist 
 ;
@@ -200,14 +211,14 @@ stmtlist:stmtlist expressionsemi
 |stmtlist varDeclaration
 |expressionsemi 
 |varDeclaration 
-|stmtlist selectionstmt {elseifflag=0;}
+|stmtlist selectionstmt {elseifflag=0;fixgoto();}
 |stmtlist iterationwhile
 |stmtlist returnstmt 
 |stmtlist switch 
 |switch 
 |iterationwhile
 |returnstmt 
-|selectionstmt {elseifflag=0;}
+|selectionstmt {elseifflag=0;fixgoto();}
 ;
 
 
@@ -218,22 +229,29 @@ loopstmtlist:stmtlist expressionsemi
 |stmtlist varDeclaration
 |expressionsemi
 |varDeclaration
-|stmtlist selectionstmt {elseifflag=0;}
+|stmtlist selectionstmt {elseifflag=0;fixgoto();}
 |stmtlist iterationwhile
 |stmtlist returnstmt
 |stmtlist switch
 |stmtlist breakstmt
 |switch
 |returnstmt
-|selectionstmt {elseifflag=0;}
+|selectionstmt {elseifflag=0;fixgoto();}
 |breakstmt
 ;
 breakstmt:breakval ';'
 ;
-selectionstmt:ifstmt '(' selectionstmt1 ')' statement 
-|ifstmt '(' selectionstmt1 ')' statement ';' 
-|ifstmt '(' selectionstmt1')' statement elsetoputflag selectionhelper 
+selectionstmt:markif '(' selectionstmt1 ')' selectiontomarkendofif
+|markif '(' selectionstmt1 ')'';' 
+|markif '(' selectionstmt1')' selectiontomarkendofif elsetoputflag selectionhelper 
 ;
+markif:ifstmt {if(elseifflag==0){push(-1,1);}}
+;
+
+selectiontomarkendofif:statement {addgotoonsuccessexec();}
+;
+
+
 elsetoputflag:elsestmt {elseifflag=1;}
 ;
 selectionstmt1:simpleExpression {if($1.type!=1){printf("expression in test  is not of type int at line %d\n",line-3);}
@@ -247,7 +265,7 @@ if(elseifflag==1)
 ;
 
 selectionhelper: selectionstmt 
-|statement  
+|{elseifflag=2;} statement 
 ;
 expressionsemi:expression ';'
 |mutable assop sumop NUM ';' 
@@ -289,7 +307,7 @@ term:term mulop factor	 {$$.type=min($1.type,$3.type); char c[10];CreateTempvar(
 |factor {$$.type=$1.type;  strcpy($$.val,$1.val);}
 ;
 
-iterationwhile:whilestmt'('selectionstmt1')'loopstatement {update_goto_stmt(1);}
+iterationwhile:whilestmt'('selectionstmt1')'loopstatement {printf("kha"); update_goto_stmt(1);  }
 |whilestmt'('selectionstmt1')' ';' {update_goto_stmt(1);}
 ;
 

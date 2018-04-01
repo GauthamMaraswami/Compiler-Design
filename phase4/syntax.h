@@ -820,20 +820,54 @@ int label;
 int gotoflag;
 }treelist[1000];
 int stack[100], top = -1;
-void push(int value){
-      top++;
-      stack[top] = value;
+int  top1 = -1;
+struct stack1{
+int list[100];
+int count;
+}stack11[150];
+
+void push(int value,int st){
+	if(st==0)
+      {
+		  top++;
+     	 stack[top] = value;
+	  }
+	  else{
+		  top1++;
+     	 stack11[top1].list[0] = value;
+		  stack11[top1].count=1;
+	  }
 }
-void pop(){
+void expand(int value){
+     	 stack11[top1].list[ stack11[top1].count] = value;
+		  stack11[top1].count++;
+		//  printf("reached%d",stack11[top1].list[ stack11[top1].count-1]);
+}
+void pop(int st){
+	if(st==0){
    if(top == -1)
       printf("\nStack is Empty!!! Deletion is not possible!!!");
    else{
       
       top--;
    }
+	}
+	else{
+		if(top1 == -1)
+      printf("\nStack is Empty!!! Deletion is not possible!!!");
+   else{
+      
+      top1--;
+   }
+	}
 }
-int gettop(){
+int gettop(int st){
+	if(st==0){
    return stack[top];
+	}
+	else{
+		return stack11[top1].list[stack11[top1].count-1];
+	}
 }
 
 int threecount=0;
@@ -854,7 +888,7 @@ void CreateDocument(char res[10],char var1[10],char op[10],char var2[10],int iff
 		strcpy(treelist[threecount].res,"goto");
 		treelist[threecount].label=threecount;
 		treelist[threecount].gotoflag=-10;
-		push(threecount);
+		push(threecount,0);
 		++threecount;
 		
 	}
@@ -869,23 +903,37 @@ void CreateDocument(char res[10],char var1[10],char op[10],char var2[10],int iff
 	//printf("%d %s\n",threecount,treelist[threecount-1].res);
 }
 void update_goto_stmt(int iswhile)
-{	int top1=gettop();
+{	int top11=gettop(0);
 	//printf("kapil bewafa hai!%d\n",top1);
-	if(top1>0)
+	if(top>=0)
 	{
+		
 		char tempdoc[200];
-		sprintf(tempdoc, "%s %d ",treelist[top1].res,threecount+1);
-		strcpy(treelist[top1].res,tempdoc);
-		treelist[top1].gotoflag=threecount+1;
+		
+		
 	//	printf("%d %s\n",treelist[top1].label+1,treelist[top1].res);
-		if(iswhile==1)
+	if(iswhile==2)
+	{
+		sprintf(tempdoc, "%s %d ",treelist[top11].res,threecount+2);
+		strcpy(treelist[top11].res,tempdoc);
+		treelist[top11].gotoflag=threecount+2;
+	
+	}
+		else if(iswhile==1)
 		{
-			sprintf(treelist[threecount].res, "goto %d ",top1-1);
+			printf("kap");
+			sprintf(tempdoc, "%s %d ",treelist[top11].res,threecount+2);
+			sprintf(treelist[threecount].res, "goto %d ",top11-1);
 			treelist[threecount].label=threecount;
-			treelist[threecount].gotoflag=top1-1;
+			treelist[threecount].gotoflag=top11-1;
 			++threecount;
 		}
-		pop();
+		else{
+			sprintf(tempdoc, "%s %d ",treelist[top11].res,threecount+2);
+		}
+		strcpy(treelist[top11].res,tempdoc);
+		treelist[top11].gotoflag=threecount+2;
+		pop(0);
 	}
 }
 void printthreeaddresscode()
@@ -894,4 +942,32 @@ void printthreeaddresscode()
 	{
 		printf("%d %s\n",treelist[i].label+1,treelist[i].res);
 	}
+}
+void addgotoonsuccessexec()
+{
+		char tempdoc[200];
+		strcpy(treelist[threecount].res,"goto");
+		treelist[threecount].label=threecount;
+		treelist[threecount].gotoflag=-10;
+		expand(threecount);
+		++threecount;
+}
+void fixgoto()
+{
+	
+	struct stack1 temp;
+	if(top1>-1){
+	//	printf("kapil bewafagh");
+	temp=stack11[top1];
+		char tempdoc[200];
+		for(int i=1;i<temp.count;++i)
+			{
+				//printf("\t%d\n",temp.list[i]);
+				sprintf(tempdoc, "%s %d ",treelist[temp.list[i]].res,threecount+1);
+				strcpy(treelist[temp.list[i]].res,tempdoc);
+				treelist[temp.list[i]].gotoflag=threecount+1;
+			}
+			pop(1);
+	}
+
 }
