@@ -109,7 +109,7 @@ union YYSTYPE
 	char cval;
   	char sval[100];
 	struct var{
-			char val[10];
+			char val[100];
 			int type;
 	}expressionvar;
 

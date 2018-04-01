@@ -14,7 +14,7 @@ int main(int aa[100],float ans1)
             }
             else
             {
-                ans=1;
+                ans=-aa[10];
             }
         }
         else if(ans<21)
@@ -28,5 +28,6 @@ int main(int aa[100],float ans1)
        
       
     }
+    ans%=1000;
     return 0;
 }

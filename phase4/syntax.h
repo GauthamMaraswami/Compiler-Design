@@ -921,7 +921,7 @@ void update_goto_stmt(int iswhile)
 	}
 		else if(iswhile==1)
 		{
-			printf("kap");
+			
 			sprintf(tempdoc, "%s %d ",treelist[top11].res,threecount+2);
 			sprintf(treelist[threecount].res, "goto %d ",top11-1);
 			treelist[threecount].label=threecount;

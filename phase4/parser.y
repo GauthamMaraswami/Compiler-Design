@@ -5,7 +5,7 @@
 	char cval;
   	char sval[100];
 	struct var{
-			char val[10];
+			char val[100];
 			int type;
 	}expressionvar;
 }
@@ -50,7 +50,7 @@
 %type <expressionvar>relExpression
 %type <expressionvar>sumExpression
 %type <expressionvar>term
-%type <ival>mutablearr
+%type <expressionvar>mutablearr
 %type <expressionvar>expressionhelper
 %type<ival>args
 %type<ival>arglist
@@ -257,10 +257,7 @@ elsetoputflag:elsestmt {elseifflag=1;}
 selectionstmt1:simpleExpression {if($1.type!=1){printf("expression in test  is not of type int at line %d\n",line-3);}
 CreateDocument($1.val,"","","",1,0);
 CreateDocument("","","","",0,1);
-if(elseifflag==1)
-{
-	printf("this is else if stmt\n");
-}
+
 	}
 ;
 
@@ -268,11 +265,22 @@ selectionhelper: selectionstmt
 |{elseifflag=2;} statement 
 ;
 expressionsemi:expression ';'
-|mutable assop sumop NUM ';' 
-|mutable assop sumop ID ';'
 ;
-expression: mutable assop expressionhelper  { $$.type=$3.type;CreateDocument($1.val,"","",$3.val,0,0); }
+expression: mutable assop expressionhelper  { $$.type=$3.type;
+if(strlen($2)==2)
+{
+	char tempe[10];
+	char c[10];CreateTempvar(c);
+	strncpy(tempe,$2,1);
+	CreateDocument(c,$1.val,tempe,$3.val,0,0);
+	CreateDocument($1.val,c,"","",0,0);
+}
+else{
+CreateDocument($1.val,"","",$3.val,0,0); 
+}}
 |expressionhelper  {$$.type=$1.type;strcpy($$.val,$1.val);}
+|mutable assop sumop immutable  {CreateDocument($1.val,"",$3,$4.val,0,0); }
+|mutable assop sumop mutable {CreateDocument($1.val,"",$3,$4.val,0,0); }
 ;
 expressionhelper:simpleExpression  {$$.type=$1.type;strcpy($$.val,$1.val);}
 |unary mutable {$$.type=$2.type;char c[10];CreateTempvar(c);if(strcmp($1,"++")==0){CreateDocument(c,$2.val,"+","1",0,0);}
@@ -307,7 +315,7 @@ term:term mulop factor	 {$$.type=min($1.type,$3.type); char c[10];CreateTempvar(
 |factor {$$.type=$1.type;  strcpy($$.val,$1.val);}
 ;
 
-iterationwhile:whilestmt'('selectionstmt1')'loopstatement {printf("kha"); update_goto_stmt(1);  }
+iterationwhile:whilestmt'('selectionstmt1')'loopstatement {update_goto_stmt(1);  }
 |whilestmt'('selectionstmt1')' ';' {update_goto_stmt(1);}
 ;
 
@@ -319,7 +327,7 @@ factor:immutable {$$.type=$1.type; strcpy($$.val,$1.val);}
 |callingnosq	 {$$.type=-10;}
 ;
 
-mutable:mutablearr {}
+mutable:mutablearr {$$.type=$1.type;strcpy($$.val,$1.val);}
 |'&' ID { push_to_symbol_table($2,"data",id.val,line,0,"0",parameter_list,0,"-1");
 /* printf("%s  %s  \n",$2,id.val); */}
 |ID	{ int ans=checkdeclaration(id,$1);
@@ -335,26 +343,26 @@ else if(ans==2||ans==4||ans==7){printf("identifier %s is of type array line %d\n
 
 
 
-mutablearr :mutablearr '[' simpleExpression ']'{$$=$1; if($3.type!=1)
+mutablearr :mutablearr '[' simpleExpression ']'{$$.type=$1.type; sprintf($$.val,"%s%s%s%s",$1.val,"[",$3.val,"]");if($3.type!=1)
  {printf("Expression in subscript not of type int at line %d\n",line);} 
- if($1!=2&&$1!=4&&$1!=7) {printf("variable  is  at line is not declared as array %d\n",line);}}
-|mutablearr  '['unary mutable']' {$$=$1; 
+ if($1.type!=2&&$1.type!=4&&$1.type!=7) {printf("variable  is  at line is not declared as array %d\n",line);}}
+|mutablearr  '['unary mutable']' {$$.type=$1.type; sprintf($$.val,"%s%s%s%s%s",$1.val,"[",$3,$4.val,"]");
 if($4.type!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
-if($1!=2&&$1!=4&&$1!=7) {printf("variable is  at line is not declared as array %d\n",line);}
+if($1.type!=2&&$1.type!=4&&$1.type!=7) {printf("variable is  at line is not declared as array %d\n",line);}
 }
-|mutablearr  '['mutable unary']' {$$=$1;
+|mutablearr  '['mutable unary']' {$$.type=$1.type;sprintf($$.val,"%s%s%s%s%s",$1.val,"[",$3.val,$4,"]");
 if($3.type!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
-if($1!=2&&$1!=4&&$1!=7) {printf("variable is  at line is not declared as array %d\n",line);}
+if($1.type!=2&&$1.type!=4&&$1.type!=7) {printf("variable is  at line is not declared as array %d\n",line);}
 }
-|ID '[' simpleExpression ']'{int ans=checkdeclaration(id,$1); $$=ans;
+|ID '[' simpleExpression ']'{int ans=checkdeclaration(id,$1); $$.type=ans;sprintf($$.val,"%s%s%s%s",$1,"[",$3.val,"]");
  if($3.type!=1)
  {printf("Expression in subscript not of type int at line %d\n",line);} 
  if(ans!=2&&ans!=4&&ans!=7) {printf("variable is  at line is not declared as array %d\n",line);}}
-|ID '['unary mutable']' {int ans=checkdeclaration(id,$1); $$=ans;
+|ID '['unary mutable']' {int ans=checkdeclaration(id,$1); $$.type=ans;sprintf($$.val,"%s%s%s%s%s",$1,"[",$3,$4.val,"]");
 if($4.type!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
 if(ans!=2&&ans!=4&&ans!=7) {printf("variable is  at line is not declared as array %d\n",line);}
 }
-|ID '['mutable unary']' {  int ans=checkdeclaration(id,$1); $$=ans;
+|ID '['mutable unary']' {  int ans=checkdeclaration(id,$1); $$.type=ans;sprintf($$.val,"%s%s%s%s%s",$1,"[",$3.val,$4,"]");
 if($3.type!=1) {printf("Expression in subscript not of type int at line %d\n",line);}
 if(ans!=2&&ans!=4&&ans!=7) {printf("variable is  at line is not declared as array %d\n",line);}
 }
