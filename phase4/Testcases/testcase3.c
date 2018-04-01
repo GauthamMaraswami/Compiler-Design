@@ -1,4 +1,4 @@
-//simple operations
+//simple condition
 #include<stdio.h>
 int main()
 {

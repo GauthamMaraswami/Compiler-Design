@@ -1,4 +1,4 @@
-//simple operations
+//while and nested while
 #include<stdio.h>
 int main()
 {

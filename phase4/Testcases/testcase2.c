@@ -1,4 +1,4 @@
-//simple operations
+//short hands operations
 #include<stdio.h>
 int main()
 {

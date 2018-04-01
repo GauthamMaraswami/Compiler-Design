@@ -1,4 +1,4 @@
-//simple operations
+//nested condition
 #include<stdio.h>
 int main()
 {
