@@ -1,5 +1,5 @@
 # Simple C Compiler
-## Done As a part of Compiler Design Code
+## Done As a part of Compiler Design Course
 
 ### tools used lex , yacc 
 
